@@ -25,7 +25,10 @@ public class SellingService extends MicroService {
         //updating currTick
         subscribeBroadcast(TickBroadcast.class,c -> this.currentTick = c.getCurrentTick() );
 
-        subscribeRequest(PurchaseOrderRequest.class,c -> {
+        subscribeRequest(PurchaseOrderRequest.class,this::handlePurchaseOrder);
+    }
+
+    private void handlePurchaseOrder(PurchaseOrderRequest c){
             Store myStore = Store.getInstance();
             Store.BuyResult result = myStore.take(c.getShoeType(),c.isOnlyDiscount());
             if (result == Store.BuyResult.REGULAR_PRICE){
@@ -60,6 +63,7 @@ public class SellingService extends MicroService {
                     }
                 });
             }
-        });
+
     }
+
 }
