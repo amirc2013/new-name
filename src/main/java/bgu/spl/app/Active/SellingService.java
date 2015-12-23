@@ -1,6 +1,7 @@
 package bgu.spl.app.Active;
 
 import bgu.spl.app.Messages.PurchaseOrderRequest;
+import bgu.spl.app.Messages.RestockRequest;
 import bgu.spl.app.Messages.TickBroadcast;
 import bgu.spl.app.Passive.Receipt;
 import bgu.spl.app.Passive.Store;
@@ -21,7 +22,7 @@ public class SellingService extends MicroService {
     @Override
     protected void initialize() {
         //updating currTick
-        subscribeBroadcast(TickBroadcast.class,c1 -> this.currentTick = c1.getCurrentTick() );
+        subscribeBroadcast(TickBroadcast.class,c -> this.currentTick = c.getCurrentTick() );
 
 
         subscribeRequest(PurchaseOrderRequest.class,c -> {
@@ -41,7 +42,17 @@ public class SellingService extends MicroService {
                 complete(c,null);
             }
             else{ //result == Store.BuyResult.NOT_IN_STOCK
-
+                sendRequest(new RestockRequest(c.getShoeType()),c1 ->
+                {
+                    if(c1){
+                        Receipt r = new Receipt(super.getName(),c.getBuyer(),c.getShoeType(),false,this.currentTick,c.getRequestTick(),1);
+                        myStore.file(r);
+                        complete(c,r);
+                    }
+                    else{
+                        complete(c,null);
+                    }
+                });
             }
         });
     }
