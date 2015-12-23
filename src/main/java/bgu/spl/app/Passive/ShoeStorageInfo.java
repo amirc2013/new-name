@@ -141,24 +141,23 @@ public class ShoeStorageInfo {
 
     /**
      * it will buy shoe as you want w/o discount.
-     * @return true if you got what you wanted (discounted or not)
+     * @return true if you bought someting succefully
      * @param wantDiscount
      */
     public boolean  buyShoe(boolean wantDiscount){
         if(amountOnStorage<0)
             throw new NotEnoughShoesToBuy("We don't have "+shoeType+" shoes to sell!");
-        else if (wantDiscount && discountedAmount == 0) {
+        else if(discountedAmount>0) {
+            this.discountedAmount--;
             this.amountOnStorage--;
+            return true;
+        }
+        else if (!wantDiscount && discountedAmount==0 && amountOnStorage>0 ) {
+            this.amountOnStorage--;
+            return true;
+        }
+        else{ //!wantDiscount && discountedAmount==0 && amountOnStorage==0
             return false;
-        }
-        else if(wantDiscount && discountedAmount>0) {
-            this.discountedAmount--;
-            this.amountOnStorage--;
-            return true;
-        }
-        else {
-            this.discountedAmount--;
-            return true;
         }
     }
 }

@@ -1,18 +1,22 @@
 package bgu.spl.app.Active;
 
+import bgu.spl.app.Messages.TickBroadcast;
+import bgu.spl.mics.MicroService;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 /**
  * Created by אמיר on 22/12/2015.
  */
-public class TimeService implements Runnable{
+public class TimeService extends MicroService{
 
     private int speed ;
     private int duration ;
-    private int currentTime;
+    private volatile int currentTime;
 
     public TimeService(int speed, int duration) {
+        super("timer");
         if(speed<=0 && duration<=0)
             throw new RuntimeException("TimeService Arguments must be valid");
         this.speed = speed;
@@ -21,13 +25,15 @@ public class TimeService implements Runnable{
     }
 
     @Override
-    public void run() {
+    protected void initialize() {
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
                 currentTime += 1;
+                sendBroadcast(new TickBroadcast(currentTime));
             }
         }, speed, speed*duration);
     }
+
 }

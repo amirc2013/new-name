@@ -44,20 +44,21 @@ public class Store {
 
 
 
-    public BuyResult take(String shoeType , boolean onlyDiscount) { // - I need to check if the synch is acceptable
+    public BuyResult take(String shoeType , boolean onlyDiscount) {
         ShoeStorageInfo shoe = storage.get(shoeType);
         if(shoe != null){
 
-            if (shoe.isAvailable()){
-                boolean ok = shoe.buyShoe(onlyDiscount);
+            boolean discounted = false;
+            if(shoe.getDiscountedAmount()>0)
+                discounted = true;
 
-                if(!ok && onlyDiscount) return BuyResult.NOT_ON_DISCOUNT;
-                else if( onlyDiscount && ok) return  BuyResult.DISCOUNTED_PRICE;
-                else return BuyResult.REGULAR_PRICE;
-            }
-            else {
-                return BuyResult.NOT_IN_STOCK;
-            }
+            boolean ok = shoe.buyShoe(onlyDiscount);
+
+            if(!ok && onlyDiscount) return BuyResult.NOT_ON_DISCOUNT;
+            else if(ok && onlyDiscount) return  BuyResult.DISCOUNTED_PRICE;
+            else if(ok && !onlyDiscount && !discounted) return  BuyResult.REGULAR_PRICE;
+            else if(ok && !onlyDiscount && discounted) return  BuyResult.DISCOUNTED_PRICE;
+            else return BuyResult.NOT_IN_STOCK;
 
         }
         else{

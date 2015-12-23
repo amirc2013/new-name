@@ -8,13 +8,32 @@ import bgu.spl.mics.Request;
  * Created by Amir on 22/12/2015.
  */
 public class PurchaseOrderRequest implements Request<Receipt> {
-    protected String shoeType;
+    private String buyer;
+    private String shoeType;
+    private boolean onlyDiscount;
+    private int requestTick ;
 
-    public PurchaseOrderRequest(String shoeType) {
+
+    public PurchaseOrderRequest(String buyer ,String shoeType, boolean onlyDiscount , int requestTick) {
         this.shoeType = shoeType;
+        this.onlyDiscount = onlyDiscount;
+        this.requestTick = requestTick;
+        this.buyer = buyer;
+    }
+
+    public String getBuyer() {
+        return buyer;
     }
 
     public String getShoeType() {
         return shoeType;
+    }
+
+    public boolean isOnlyDiscount() {
+        return onlyDiscount;
+    }
+
+    public int getRequestTick() {
+        return requestTick;
     }
 }
