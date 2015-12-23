@@ -2,7 +2,6 @@ package bgu.spl.app.Active;
 
 import bgu.spl.app.Messages.PurchaseOrderRequest;
 import bgu.spl.app.Messages.RestockRequest;
-import bgu.spl.app.Messages.TerminationBroadcast;
 import bgu.spl.app.Messages.TickBroadcast;
 import bgu.spl.app.Passive.Receipt;
 import bgu.spl.app.Passive.Store;
@@ -25,8 +24,7 @@ public class SellingService extends MicroService {
     protected void initialize() {
         //updating currTick
         subscribeBroadcast(TickBroadcast.class,c -> this.currentTick = c.getCurrentTick() );
-        subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
-        subscribeRequest(PurchaseOrderRequest.class, this::handlePurchaseOrder);
+        subscribeRequest(PurchaseOrderRequest.class,this::handlePurchaseOrder);
     }
 
     private void handlePurchaseOrder(PurchaseOrderRequest c){

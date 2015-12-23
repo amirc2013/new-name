@@ -41,7 +41,9 @@ public class ManagementService extends MicroService {
                         sch -> sch.getTick() == broadcast.getCurrentTick())
                 .findFirst();
         if(s.isPresent()){
-            sendBroadcast(new NewDiscountBroadcast(s.get().getShoeType()));
+            sendBroadcast(new NewDiscountBroadcast(s.get().getShoeType(),s.get().getAmount()));
+            Store store = Store.getInstance();
+            store.addDiscount(s.get().getShoeType(),s.get().getAmount());
             System.out.println("Broadcast : we have a 50% discount on : " + s.get().getShoeType());
         }
     }

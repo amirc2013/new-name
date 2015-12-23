@@ -2,7 +2,6 @@ package bgu.spl.app.Active;
 
 import bgu.spl.app.Messages.NewDiscountBroadcast;
 import bgu.spl.app.Messages.PurchaseOrderRequest;
-import bgu.spl.app.Messages.TerminationBroadcast;
 import bgu.spl.app.Messages.TickBroadcast;
 import bgu.spl.app.Passive.PurchaseSchedule;
 import bgu.spl.app.Passive.Store;
@@ -32,12 +31,24 @@ public class WebsiteClientService extends MicroService {
 
     @Override
     protected void initialize() {
-        subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
         Store myStore = Store.getInstance();
 
         //updating currTick
-        subscribeBroadcast(TickBroadcast.class, c ->
-        {
+        subscribeBroadcast(TickBroadcast.class, this::handleTicks);
+        subscribeBroadcast(NewDiscountBroadcast.class,this::handleDiscountBro);
+    }
+    private void handleDiscountBro(NewDiscountBroadcast c){
+            if(set.contains(c.getShoeName())){
+                sendRequest(new PurchaseOrderRequest(getName(),c.getShoeName(),true,currentTick),c1 ->{
+                    if(c1!=null){
+                        set.remove(c.getShoeName());
+                        //System.out.println(this.getName()+" has successfully got "+c.getShoeName());
+                    }
+                });
+            }
+    }
+
+    private void handleTicks(TickBroadcast c){
             this.currentTick = c.getCurrentTick();
 
             for(PurchaseSchedule ps : list){
@@ -48,17 +59,5 @@ public class WebsiteClientService extends MicroService {
                     );
                 }
             }
-        } );
-
-        subscribeBroadcast(NewDiscountBroadcast.class,c -> {
-            if(set.contains(c.getShoeName())){
-                sendRequest(new PurchaseOrderRequest(getName(),c.getShoeName(),true,currentTick),c1 ->{
-                   if(c1!=null){
-                       set.remove(c.getShoeName());
-                       System.out.println(this.getName() + " has successfully bought " + c.getShoeName());
-                   }
-                });
-            }
-        });
     }
 }

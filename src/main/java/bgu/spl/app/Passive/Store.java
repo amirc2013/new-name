@@ -47,7 +47,6 @@ public class Store {
     public BuyResult take(String shoeType , boolean onlyDiscount) {
         ShoeStorageInfo shoe = storage.get(shoeType);
         if(shoe != null){
-
             boolean discounted = false;
             if(shoe.getDiscountedAmount()>0)
                 discounted = true;

@@ -11,8 +11,8 @@ import bgu.spl.app.Json.StockInfo;
 public class ShoeStorageInfo {
 
     private String shoeType ;
-    private int amountOnStorage;
-    private int discountedAmount;
+    private volatile int amountOnStorage;
+    private volatile int discountedAmount;
 
 
     /**
@@ -128,7 +128,7 @@ public class ShoeStorageInfo {
         if (newAmount+this.discountedAmount > amountOnStorage) {throw new RuntimeException("YOU WANT More discounted shoes than we have in our storage ?");}
 
 
-        this.amountOnStorage = this.amountOnStorage + newAmount;
+        this.discountedAmount = newAmount;
     }
 
 
@@ -157,14 +157,21 @@ public class ShoeStorageInfo {
         else if(discountedAmount>0) {
             this.discountedAmount--;
             this.amountOnStorage--;
+            //System.out.println("Shoes Info : "+getShoeType()+" has : TOTAL-"+amountOnStorage+ " , DISCOUNTED-"+discountedAmount);
             return true;
         }
         else if (!wantDiscount && discountedAmount==0 && amountOnStorage>0 ) {
             this.amountOnStorage--;
+            //System.out.println("Shoes Info : "+getShoeType()+" has : TOTAL-"+amountOnStorage +" , DISCOUNTED-"+discountedAmount);
             return true;
         }
         else{ //!wantDiscount && discountedAmount==0 && amountOnStorage==0
             return false;
         }
+    }
+
+
+    public void resetDiscounted(){
+        this.discountedAmount = 0;
     }
 }

@@ -9,12 +9,18 @@ import bgu.spl.mics.Message;
 public class NewDiscountBroadcast implements Broadcast {
 
     private String shoeName ;
+    private int amount;
 
     public String getShoeName() {
         return shoeName;
     }
 
-    public NewDiscountBroadcast(String shoeName) {
+    public int getAmount() {
+        return amount;
+    }
+
+    public NewDiscountBroadcast(String shoeName, int amount) {
+        this.amount = amount;
 
         this.shoeName = shoeName;
     }
