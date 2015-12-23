@@ -11,9 +11,6 @@ import java.util.logging.Logger;
  * Created by Amir on 22/12/2015.
  */
 public class TimeService extends MicroService{
-
-    Logger logger = Logger.getLogger(TimeService.class.getName());
-
     private int speed ;
     private int duration ;
     private volatile int currentTime;
@@ -35,10 +32,14 @@ public class TimeService extends MicroService{
             public void run() {
                 currentTime += 1;
                 sendBroadcast(new TickBroadcast(currentTime));
-                logger.info("Broadcasting time: "+currentTime);
-
+                System.out.println("Broadcast : The time now is "+currentTime);
+                if(currentTime >= duration){
+                    System.out.println("TimeService terminating !");
+                    t.cancel();
+                    terminate();
+                }
             }
-        }, speed, speed*duration);
+        }, 0, speed);
     }
 
 }
