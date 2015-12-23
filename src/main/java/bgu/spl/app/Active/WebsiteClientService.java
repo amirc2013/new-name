@@ -41,7 +41,7 @@ public class WebsiteClientService extends MicroService {
             for(PurchaseSchedule ps : list){
                 if(ps.getTick() == c.getCurrentTick()){
                     sendRequest(new PurchaseOrderRequest(getName(),ps.getShoeType(),false,currentTick),c1 ->
-                            System.out.println(this.getName()+" is trying to buy "+ps.getShoeType())
+                            System.out.println(this.getName()+" is trying to buy "+ps.getShoeType()+c)
                     );
                 }
             }
