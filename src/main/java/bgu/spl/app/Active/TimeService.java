@@ -5,11 +5,14 @@ import bgu.spl.mics.MicroService;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 /**
  * Created by Amir on 22/12/2015.
  */
 public class TimeService extends MicroService{
+
+    Logger logger = Logger.getLogger(TimeService.class.getName());
 
     private int speed ;
     private int duration ;
@@ -32,7 +35,7 @@ public class TimeService extends MicroService{
             public void run() {
                 currentTime += 1;
                 sendBroadcast(new TickBroadcast(currentTime));
-                System.out.println("BroadCast : The time now is "+currentTime);
+                logger.info("Broadcasting time: "+currentTime);
 
             }
         }, speed, speed*duration);
