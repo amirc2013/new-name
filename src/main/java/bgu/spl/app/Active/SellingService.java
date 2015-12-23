@@ -42,7 +42,7 @@ public class SellingService extends MicroService {
             }
             else if(result == Store.BuyResult.NOT_ON_DISCOUNT){
                 complete(c,null);
-                System.out.println(c.getBuyer() + " has not bought "+c.getShoeType()+" since it does not has Discount");
+                System.out.println(c.getBuyer() + " has not bought "+c.getShoeType()+" since it does not have Discount");
             }
             else{ //result == Store.BuyResult.NOT_IN_STOCK
                 sendRequest(new RestockRequest(c.getShoeType()),c1 ->
