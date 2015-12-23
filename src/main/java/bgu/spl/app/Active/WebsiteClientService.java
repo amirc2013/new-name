@@ -42,7 +42,7 @@ public class WebsiteClientService extends MicroService {
                 sendRequest(new PurchaseOrderRequest(getName(),c.getShoeName(),true,currentTick),c1 ->{
                     if(c1!=null){
                         set.remove(c.getShoeName());
-                        System.out.println(this.getName()+" has successfully bought "+c.getShoeName());
+                        //System.out.println(this.getName()+" has successfully got "+c.getShoeName());
                     }
                 });
             }
