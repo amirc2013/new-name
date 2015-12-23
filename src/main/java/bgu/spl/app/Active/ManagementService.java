@@ -1,9 +1,6 @@
 package bgu.spl.app.Active;
 
-import bgu.spl.app.Messages.ManufacturingOrderRequest;
-import bgu.spl.app.Messages.NewDiscountBroadcast;
-import bgu.spl.app.Messages.RestockRequest;
-import bgu.spl.app.Messages.TickBroadcast;
+import bgu.spl.app.Messages.*;
 import bgu.spl.app.Passive.DiscountSchedule;
 import bgu.spl.app.Passive.Receipt;
 import bgu.spl.app.Passive.Store;
@@ -32,7 +29,12 @@ public class ManagementService extends MicroService {
     @Override
     protected void initialize() {
         subscribeBroadcast(TickBroadcast.class, this::handleTick);
+        subscribeBroadcast(TerminationBroadcast.class, this::handleTermination);
         subscribeRequest(RestockRequest.class, this::handleRestockRequest);
+    }
+
+    private void handleTermination(TerminationBroadcast terminationBroadcast) {
+        terminate();
     }
 
     private void handleTick(TickBroadcast broadcast) {

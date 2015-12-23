@@ -1,5 +1,6 @@
 package bgu.spl.app.Active;
 
+import bgu.spl.app.Messages.TerminationBroadcast;
 import bgu.spl.app.Messages.TickBroadcast;
 import bgu.spl.mics.MicroService;
 
@@ -34,6 +35,8 @@ public class TimeService extends MicroService{
                 sendBroadcast(new TickBroadcast(currentTime));
                 System.out.println("Broadcast : The time now is "+currentTime);
                 if(currentTime >= duration){
+                    sendBroadcast(new TerminationBroadcast());
+                    System.out.println("Termination Broadcast");
                     System.out.println("TimeService terminating !");
                     t.cancel();
                     terminate();
