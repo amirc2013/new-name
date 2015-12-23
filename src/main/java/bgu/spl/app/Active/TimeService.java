@@ -12,8 +12,6 @@ import java.util.logging.Logger;
  */
 public class TimeService extends MicroService{
 
-    Logger logger = Logger.getLogger(TimeService.class.getName());
-
     private int speed ;
     private int duration ;
     private volatile int currentTime;
@@ -35,8 +33,7 @@ public class TimeService extends MicroService{
             public void run() {
                 currentTime += 1;
                 sendBroadcast(new TickBroadcast(currentTime));
-                logger.info("Broadcasting time: "+currentTime);
-
+                System.out.println("Broadcast : the time is "+currentTime);
             }
         }, speed, speed*duration);
     }
