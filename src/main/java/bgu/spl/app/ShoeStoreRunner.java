@@ -1,9 +1,6 @@
 package bgu.spl.app;
 
-import bgu.spl.app.Active.ManagementService;
-import bgu.spl.app.Active.ShoeFactoryService;
-import bgu.spl.app.Active.TimeService;
-import bgu.spl.app.Active.WebsiteClientService;
+import bgu.spl.app.Active.*;
 import bgu.spl.app.Json.*;
 import bgu.spl.app.Passive.DiscountSchedule;
 import bgu.spl.app.Passive.PurchaseSchedule;
@@ -75,7 +72,7 @@ public class ShoeStoreRunner {
     private void initSellers(int sellers) {
         ExecutorService service = Executors.newFixedThreadPool(sellers);
         for(int i = 0 ; i < sellers ; i++)
-            service.execute(new ShoeFactoryService("ShoeFactoryService"+i));
+            service.execute(new SellingService("SellingService"+i));
     }
 
     private void initFactories(int factories) {

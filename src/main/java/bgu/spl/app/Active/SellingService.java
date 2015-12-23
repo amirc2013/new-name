@@ -17,13 +17,13 @@ public class SellingService extends MicroService {
     public SellingService(String name){
         super(name);
         currentTick = 0 ;
+        System.out.println(this.getName()+" is here to serve our customer !");
     }
 
     @Override
     protected void initialize() {
         //updating currTick
         subscribeBroadcast(TickBroadcast.class,c -> this.currentTick = c.getCurrentTick() );
-
 
         subscribeRequest(PurchaseOrderRequest.class,c -> {
             Store myStore = Store.getInstance();

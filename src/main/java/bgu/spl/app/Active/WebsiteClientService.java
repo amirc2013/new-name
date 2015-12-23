@@ -25,6 +25,8 @@ public class WebsiteClientService extends MicroService {
         currentTick = 0 ;
         this.list = list;
         this.set = set;
+
+        System.out.println(name + " has logged into the store !");
     }
 
     @Override
@@ -39,7 +41,7 @@ public class WebsiteClientService extends MicroService {
             for(PurchaseSchedule ps : list){
                 if(ps.getTick() == c.getCurrentTick()){
                     sendRequest(new PurchaseOrderRequest(getName(),ps.getShoeType(),false,currentTick),c1 ->
-                        System.out.println(this.getName()+" is trying to buy "+ps.getShoeType())
+                            System.out.println(this.getName()+" is trying to buy "+ps.getShoeType())
                     );
                 }
             }
