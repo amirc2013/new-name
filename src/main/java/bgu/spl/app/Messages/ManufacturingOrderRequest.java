@@ -9,12 +9,24 @@ import bgu.spl.mics.Request;
  */
 public class ManufacturingOrderRequest implements Request<Receipt> {
     protected String shoeType;
+    protected int amount;
+    protected int issuedTick;
 
-    public ManufacturingOrderRequest(String shoeType) {
+    public ManufacturingOrderRequest(String shoeType, int amount, int issuedTick) {
         this.shoeType = shoeType;
+        this.amount = amount;
+        this.issuedTick = issuedTick;
     }
 
     public String getShoeType() {
         return shoeType;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public int getIssuedTick() {
+        return issuedTick;
     }
 }
