@@ -29,12 +29,8 @@ public class ManagementService extends MicroService {
     @Override
     protected void initialize() {
         subscribeBroadcast(TickBroadcast.class, this::handleTick);
-        subscribeBroadcast(TerminationBroadcast.class, this::handleTermination);
+        subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
         subscribeRequest(RestockRequest.class, this::handleRestockRequest);
-    }
-
-    private void handleTermination(TerminationBroadcast terminationBroadcast) {
-        terminate();
     }
 
     private void handleTick(TickBroadcast broadcast) {

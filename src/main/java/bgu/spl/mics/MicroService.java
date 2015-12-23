@@ -1,10 +1,12 @@
 package bgu.spl.mics;
 
+import bgu.spl.app.PrettyLogger;
 import bgu.spl.mics.impl.MessageBusImpl;
 import bgu.spl.mics.impl.RequestCompleted;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * The MicroService is an abstract class that any micro-service in the system
@@ -25,9 +27,10 @@ import java.util.Map;
  */
 public abstract class MicroService implements Runnable {
 
+    private Logger LOGGER;
+
     private boolean terminated = false;
     private final String name;
-
 
     MessageBus bus = MessageBusImpl.getInstance();
 
@@ -41,6 +44,7 @@ public abstract class MicroService implements Runnable {
      */
     public MicroService(String name) {
         this.name = name;
+        LOGGER = PrettyLogger.getLogger(name);
     }
 
     /**
@@ -148,6 +152,7 @@ public abstract class MicroService implements Runnable {
      * message.
      */
     protected final void terminate() {
+        LOGGER.info("terminating ...");
         this.terminated = true;
     }
 
@@ -167,6 +172,7 @@ public abstract class MicroService implements Runnable {
     public final void run() {
         initialize();
         bus.register(this);
+        LOGGER.info("starting ...");
         while (!terminated) {
             try {
                 Message m = bus.awaitMessage(this);
@@ -190,6 +196,7 @@ public abstract class MicroService implements Runnable {
                 e.printStackTrace();
             }
         }
+        LOGGER.info("ended");
         bus.unregister(this);
     }
 }

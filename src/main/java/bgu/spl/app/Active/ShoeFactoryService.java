@@ -1,6 +1,7 @@
 package bgu.spl.app.Active;
 
 import bgu.spl.app.Messages.ManufacturingOrderRequest;
+import bgu.spl.app.Messages.TerminationBroadcast;
 import bgu.spl.app.Messages.TickBroadcast;
 import bgu.spl.app.Passive.Receipt;
 import bgu.spl.mics.MicroService;
@@ -25,6 +26,7 @@ public class ShoeFactoryService extends MicroService{
     @Override
     protected void initialize() {
         subscribeBroadcast(TickBroadcast.class,this::handleTickBroadcast);
+        subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
         subscribeRequest(ManufacturingOrderRequest.class, this::handleManufacturingOrderRequest);
     }
 

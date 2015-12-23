@@ -28,6 +28,7 @@ public class TimeService extends MicroService{
 
     @Override
     protected void initialize() {
+        subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override

@@ -2,6 +2,7 @@ package bgu.spl.app.Active;
 
 import bgu.spl.app.Messages.NewDiscountBroadcast;
 import bgu.spl.app.Messages.PurchaseOrderRequest;
+import bgu.spl.app.Messages.TerminationBroadcast;
 import bgu.spl.app.Messages.TickBroadcast;
 import bgu.spl.app.Passive.PurchaseSchedule;
 import bgu.spl.app.Passive.Store;
@@ -31,6 +32,7 @@ public class WebsiteClientService extends MicroService {
 
     @Override
     protected void initialize() {
+        subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
         Store myStore = Store.getInstance();
 
         //updating currTick
@@ -53,7 +55,7 @@ public class WebsiteClientService extends MicroService {
                 sendRequest(new PurchaseOrderRequest(getName(),c.getShoeName(),true,currentTick),c1 ->{
                    if(c1!=null){
                        set.remove(c.getShoeName());
-                       System.out.println(this.getName()+" has successfully bought "+c.getShoeName());
+                       System.out.println(this.getName() + " has successfully bought " + c.getShoeName());
                    }
                 });
             }
