@@ -91,6 +91,7 @@ public class Store {
         else{
             storage.get(shoeType).addNewShoes(amount);
         }
+        System.out.println("Store : We added "+amount+" shoes of : "+shoeType);
     }
 
 
@@ -107,7 +108,7 @@ public class Store {
         else{
             storage.get(shoeType).addNewDiscountedShoes(amount);
         }
-
+        System.out.println("Store : "+amount+" DISCOUNTED shoes of : "+shoeType+" has been added");
     }
 
     /**
@@ -135,7 +136,7 @@ public class Store {
                 synchronized (System.out) {
                     System.out.println("Seller : "+r.getSeller()+" , Customer : "+r.getCustomer()+" , Shoe Type : "+r.getShoeType()
                             +" , isDiscounted:"+r.isDiscount()+" , Issued Tick : "+r.getIssuedTick()+" , Request Tick : "+
-                            r.getRequestTick()+" , Amount Sole : "+r.getAmountSold());
+                            r.getRequestTick()+" , Amount Sold : "+r.getAmountSold());
                 }
             }
         }

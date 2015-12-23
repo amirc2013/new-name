@@ -2,6 +2,7 @@ package bgu.spl.app.Active;
 
 import bgu.spl.app.Messages.TerminationBroadcast;
 import bgu.spl.app.Messages.TickBroadcast;
+import bgu.spl.app.Passive.Store;
 import bgu.spl.mics.MicroService;
 
 import java.util.Timer;
@@ -38,6 +39,8 @@ public class TimeService extends MicroService{
                     sendBroadcast(new TerminationBroadcast());
                     System.out.println("Termination Broadcast");
                     System.out.println("TimeService terminating !");
+                    Store store = Store.getInstance();
+                    store.print();
                     t.cancel();
                     terminate();
                 }
