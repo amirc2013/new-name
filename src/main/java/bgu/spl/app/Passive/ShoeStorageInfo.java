@@ -3,6 +3,7 @@ package bgu.spl.app.Passive;
 import bgu.spl.Exception.NegativeNumber;
 import bgu.spl.Exception.NotEnoughItem;
 import bgu.spl.Exception.NotEnoughShoesToBuy;
+import bgu.spl.app.Json.StockInfo;
 
 /**
  * Created by Amir on 20/12/2015.
@@ -37,6 +38,12 @@ public class ShoeStorageInfo {
         this.shoeType = shoesType;
         amountOnStorage = newStorage;
         discountedAmount = newDiscount;
+    }
+
+    public ShoeStorageInfo(StockInfo f) {
+        shoeType = f.getShoeType();
+        amountOnStorage = f.getAmount();
+        discountedAmount = 0;
     }
 
 

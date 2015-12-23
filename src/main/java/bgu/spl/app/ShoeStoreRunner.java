@@ -1,13 +1,34 @@
 package bgu.spl.app;
 
-import bgu.spl.app.Json.ExecutionInfo;
+import bgu.spl.app.Active.ManagementService;
+import bgu.spl.app.Active.ShoeFactoryService;
+import bgu.spl.app.Active.TimeService;
+import bgu.spl.app.Active.WebsiteClientService;
+import bgu.spl.app.Json.*;
+import bgu.spl.app.Passive.DiscountSchedule;
+import bgu.spl.app.Passive.PurchaseSchedule;
+import bgu.spl.app.Passive.ShoeStorageInfo;
 import bgu.spl.app.Passive.Store;
 import com.google.gson.Gson;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class ShoeStoreRunner {
+
+    Store store = Store.getInstance();
+
+    ExecutionInfo executionInfo;
+    public ShoeStoreRunner(ExecutionInfo executionInfo) {
+        this.executionInfo = executionInfo;
+        execute();
+    }
 
     public static void main(String[] args){
         if(args == null || args.length == 0)
@@ -17,13 +38,60 @@ public class ShoeStoreRunner {
         Gson gson = new Gson();
         try {
             ExecutionInfo executionInfo = gson.fromJson(new FileReader(gsonFilePath), ExecutionInfo.class);
-            execute(executionInfo);
+            new ShoeStoreRunner(executionInfo);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(String.format("Gson file (%s) not found !",gsonFilePath));
         }
     }
 
-    private static void execute(ExecutionInfo executionInfo) {
 
+
+    private void execute() {
+        initStorage(executionInfo.getInitialStorage());
+        initServices(executionInfo.getServices());
     }
+
+    void initStorage(List<StockInfo> initialStorage){
+        List<ShoeStorageInfo> shoeStorageInfos = initialStorage.stream().map(ShoeStorageInfo::new).collect(Collectors.toCollection(LinkedList::new));
+        store.load(shoeStorageInfos.toArray(new ShoeStorageInfo[initialStorage.size()]));
+    }
+
+    void initServices(ServicesInfo info){
+        initManagerService(info.getManager());
+        initFactories(info.getFactories());
+        initSellers(info.getSellers());
+        initCustomers(info.getCustomers());
+        initTimerService(info.getTime());
+    }
+
+    private void initCustomers(List<CustomerInfo> customers) {
+        ExecutorService service = Executors.newFixedThreadPool(customers.size());
+        for(CustomerInfo c : customers){
+            List<PurchaseSchedule> purchaseSchedules = c.getPurchaseSchedule().stream().map(PurchaseSchedule::new).collect(Collectors.toCollection(LinkedList::new));
+            service.execute(new WebsiteClientService(c.getName(),purchaseSchedules, c.getWishList()));
+        }
+    }
+
+    private void initSellers(int sellers) {
+        ExecutorService service = Executors.newFixedThreadPool(sellers);
+        for(int i = 0 ; i < sellers ; i++)
+            service.execute(new ShoeFactoryService("ShoeFactoryService"+i));
+    }
+
+    private void initFactories(int factories) {
+        ExecutorService service = Executors.newFixedThreadPool(factories);
+        for(int i = 0 ; i < factories ; i++)
+            service.execute(new ShoeFactoryService("ShoeFactoryService"+i));
+    }
+
+    private void initTimerService(TimeServiceInfo time) {
+        new Thread(new TimeService(time.getSpeed(),time.getDuration())).start();
+    }
+
+    private void initManagerService(ManagerServiceInfo manager) {
+        List<DiscountSchedule> shoeStorageInfos = manager.getDiscountSchedule().stream().map(DiscountSchedule::new).collect(Collectors.toCollection(LinkedList::new));
+        new Thread(new ManagementService(shoeStorageInfos)).start();
+    }
+
+
 }

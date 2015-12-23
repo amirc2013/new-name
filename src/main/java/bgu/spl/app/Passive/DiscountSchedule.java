@@ -1,5 +1,7 @@
 package bgu.spl.app.Passive;
 
+import bgu.spl.app.Json.DiscountScheduleInfo;
+
 /**
  * Created by Amir on 22/12/2015.
  */
@@ -10,6 +12,12 @@ public class DiscountSchedule {
     private String shoeType;
     private int tick;
     private int amount;
+
+    public DiscountSchedule(DiscountScheduleInfo discountScheduleInfo) {
+        shoeType = discountScheduleInfo.getShoeType();
+        tick = discountScheduleInfo.getTick();
+        amount = discountScheduleInfo.getAmount();
+    }
 
     public String getShoeType() {
         return shoeType;

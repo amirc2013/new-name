@@ -29,7 +29,7 @@ public class ShoeFactoryService extends MicroService{
     }
 
     private void handleTickBroadcast(TickBroadcast tickBroadcast) {
-        currentTick++;
+        currentTick = tickBroadcast.getCurrentTick();
         if(!queue.isEmpty()){
             completedShoes++;
             if(completedShoes >= queue.peek().getAmount()){
