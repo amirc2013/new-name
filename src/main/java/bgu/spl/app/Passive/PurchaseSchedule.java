@@ -9,6 +9,7 @@ public class PurchaseSchedule {
     private String shoeType;
     private int tick; // The tick number to send the PurchaseOrderRequest at.
 
+
     public String getShoeType() {
         return shoeType;
     }
@@ -16,6 +17,7 @@ public class PurchaseSchedule {
     public int getTick() {
         return tick;
     }
+
 
     public PurchaseSchedule(int tick, String shoeType) {
         this.tick = tick;

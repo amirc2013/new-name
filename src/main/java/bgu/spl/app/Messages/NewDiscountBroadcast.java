@@ -8,5 +8,14 @@ import bgu.spl.mics.Message;
  */
 public class NewDiscountBroadcast implements Broadcast {
 
+    private String shoeName ;
 
+    public String getShoeName() {
+        return shoeName;
+    }
+
+    public NewDiscountBroadcast(String shoeName) {
+
+        this.shoeName = shoeName;
+    }
 }

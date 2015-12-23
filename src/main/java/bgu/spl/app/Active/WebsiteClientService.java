@@ -1,8 +1,10 @@
 package bgu.spl.app.Active;
 
 import bgu.spl.app.Messages.NewDiscountBroadcast;
+import bgu.spl.app.Messages.PurchaseOrderRequest;
 import bgu.spl.app.Messages.TickBroadcast;
 import bgu.spl.app.Passive.PurchaseSchedule;
+import bgu.spl.app.Passive.Store;
 import bgu.spl.mics.MicroService;
 
 import java.util.List;
@@ -27,14 +29,32 @@ public class WebsiteClientService extends MicroService {
 
     @Override
     protected void initialize() {
+        Store myStore = Store.getInstance();
+
         //updating currTick
-        subscribeBroadcast(TickBroadcast.class, c -> this.currentTick = c.getCurrentTick() );
+        subscribeBroadcast(TickBroadcast.class, c ->
+        {
+            this.currentTick = c.getCurrentTick();
+
+            for(PurchaseSchedule ps : list){
+                if(ps.getTick() == c.getCurrentTick()){
+                    sendRequest(new PurchaseOrderRequest(getName(),ps.getShoeType(),false,currentTick),c1 -> {
+                        // TODO something when he buy !
+                    });
+                }
+            }
+        } );
 
         subscribeBroadcast(NewDiscountBroadcast.class,c -> {
-            for(String shoes : set){
-
+            if(set.contains(c.getShoeName())){
+                sendRequest(new PurchaseOrderRequest(getName(),c.getShoeName(),true,currentTick),c1 ->{
+                   if(c1!=null){
+                       set.remove(c.getShoeName());
+                   }
+                });
             }
         });
+
 
 
     }
