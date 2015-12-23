@@ -1,15 +1,20 @@
 package bgu.spl.app.Passive;
 
 
+import bgu.spl.app.PrettyLogger;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 
 
 /**
  * Created by Amir on 21/12/2015.
  */
 public class Store {
+
+    Logger LOGGER;
 
     //ENUM
     public enum BuyResult {
@@ -31,6 +36,7 @@ public class Store {
         storage = new ConcurrentHashMap<String, ShoeStorageInfo>();
         receipts = Collections.synchronizedList(new LinkedList<Receipt>());
         receipts_lock = new Object();
+        LOGGER = PrettyLogger.getLogger("Store");
     }
 
 
@@ -107,7 +113,7 @@ public class Store {
         else{
             storage.get(shoeType).addNewDiscountedShoes(amount);
         }
-        System.out.println("Store : "+amount+" DISCOUNTED shoes of : "+shoeType+" has been added");
+        LOGGER.info("Store : "+amount+" DISCOUNTED shoes of : "+shoeType+" has been added");
     }
 
     /**

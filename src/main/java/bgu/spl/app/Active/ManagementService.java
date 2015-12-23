@@ -44,7 +44,7 @@ public class ManagementService extends MicroService {
             sendBroadcast(new NewDiscountBroadcast(s.get().getShoeType(),s.get().getAmount()));
             Store store = Store.getInstance();
             store.addDiscount(s.get().getShoeType(),s.get().getAmount());
-            System.out.println("Broadcast : we have a 50% discount on : " + s.get().getShoeType());
+            LOGGER.info("Broadcast : we have a 50% discount on : " + s.get().getShoeType());
         }
     }
 
@@ -59,7 +59,7 @@ public class ManagementService extends MicroService {
             boolean b = sendRequest(request, this::onManufacturingOrderRequestCompleted);
             if(b) {
                 restockRequests.put(r.getShoeType(), restockRequests.get(r.getShoeType()) + requestAmount);
-                System.out.println("We restock "+requestAmount+" "+r.getShoeType()+" but be aware that some of the shoes a kept for someone else");
+                LOGGER.info("We restock "+requestAmount+" "+r.getShoeType()+" but be aware that some of the shoes a kept for someone else");
             }
             else
                 complete(r,false);

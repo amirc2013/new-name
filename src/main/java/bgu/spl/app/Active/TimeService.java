@@ -35,13 +35,11 @@ public class TimeService extends MicroService{
             public void run() {
                 currentTime += 1;
                 sendBroadcast(new TickBroadcast(currentTime));
-                System.out.println("Broadcast : The time now is "+currentTime);
+                LOGGER.info("Broadcast : The time now is "+currentTime);
                 if(currentTime >= duration){
                     sendBroadcast(new TerminationBroadcast());
-                    System.out.println("Termination Broadcast");
-                    System.out.println("TimeService terminating !");
-                    Store store = Store.getInstance();
-                    store.print();
+                    LOGGER.info("Termination Broadcast");
+                    LOGGER.info("TimeService terminating !");
                     t.cancel();
                     terminate();
                 }

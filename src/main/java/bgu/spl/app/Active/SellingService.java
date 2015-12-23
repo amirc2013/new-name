@@ -17,7 +17,7 @@ public class SellingService extends MicroService {
     public SellingService(String name){
         super(name);
         currentTick = 0 ;
-        System.out.println(this.getName()+" is here to serve our customer !");
+        LOGGER.info(this.getName()+" is here to serve our customer !");
     }
 
     @Override
@@ -34,17 +34,17 @@ public class SellingService extends MicroService {
                 Receipt r = new Receipt(super.getName(),c.getBuyer(),c.getShoeType(),false,this.currentTick,c.getRequestTick(),1);
                 myStore.file(r);
                 complete(c,r);
-                System.out.println(c.getBuyer() + " has bought "+c.getShoeType()+" successfully without Discount");
+                LOGGER.info(c.getBuyer() + " has bought "+c.getShoeType()+" successfully without Discount");
             }
             else if (result == Store.BuyResult.DISCOUNTED_PRICE) {
                 Receipt r = new Receipt(super.getName(),c.getBuyer(),c.getShoeType(),true,this.currentTick,c.getRequestTick(),1);
                 myStore.file(r);
                 complete(c,r);
-                System.out.println(c.getBuyer() + " has bought "+c.getShoeType()+" successfully with Discount ! woohoo");
+                LOGGER.info(c.getBuyer() + " has bought "+c.getShoeType()+" successfully with Discount ! woohoo");
             }
             else if(result == Store.BuyResult.NOT_ON_DISCOUNT){
                 complete(c,null);
-                System.out.println(c.getBuyer() + " has not bought "+c.getShoeType()+" since it does not have Discount");
+                LOGGER.info(c.getBuyer() + " has not bought "+c.getShoeType()+" since it does not have Discount");
             }
             else{ //result == Store.BuyResult.NOT_IN_STOCK
                 sendRequest(new RestockRequest(c.getShoeType()),c1 ->
@@ -53,11 +53,11 @@ public class SellingService extends MicroService {
                         Receipt r = new Receipt(super.getName(),c.getBuyer(),c.getShoeType(),false,this.currentTick,c.getRequestTick(),1);
                         myStore.file(r);
                         complete(c,r);
-                        System.out.println(c.getBuyer() + " has bought "+c.getShoeType()+" successfully without Discount (after Restock)");
+                        LOGGER.info(c.getBuyer() + " has bought "+c.getShoeType()+" successfully without Discount (after Restock)");
                     }
                     else{
                         complete(c,null);
-                        System.out.println(c.getBuyer() + " has not bought "+c.getShoeType()+" since we dont have shoes of that kind left");
+                        LOGGER.info(c.getBuyer() + " has not bought "+c.getShoeType()+" since we dont have shoes of that kind left");
 
                     }
                 });
