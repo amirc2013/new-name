@@ -32,6 +32,8 @@ public class TimeService extends MicroService{
             public void run() {
                 currentTime += 1;
                 sendBroadcast(new TickBroadcast(currentTime));
+                System.out.println("BroadCast : The time now is "+currentTime);
+
             }
         }, speed, speed*duration);
     }

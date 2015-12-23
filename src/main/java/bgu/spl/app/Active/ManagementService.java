@@ -7,10 +7,8 @@ import bgu.spl.app.Messages.TickBroadcast;
 import bgu.spl.app.Passive.DiscountSchedule;
 import bgu.spl.app.Passive.Receipt;
 import bgu.spl.app.Passive.Store;
-import bgu.spl.mics.MessageBus;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.Request;
-import bgu.spl.mics.impl.MessageBusImpl;
 
 import java.util.*;
 
@@ -46,6 +44,7 @@ public class ManagementService extends MicroService {
                 .findFirst();
         if(s.isPresent()){
             sendBroadcast(new NewDiscountBroadcast(s.get().getShoeType()));
+            System.out.println("Broadcast : we have a 50% discount on : " + s.get().getShoeType());
         }
     }
 
@@ -58,8 +57,10 @@ public class ManagementService extends MicroService {
             int requestAmount = currentTick % 5 + 1;
             Request<Receipt> request = new ManufacturingOrderRequest(r.getShoeType(),requestAmount,currentTick);
             boolean b = sendRequest(request, this::onManufacturingOrderRequestCompleted);
-            if(b)
-                restockRequests.put(r.getShoeType(),restockRequests.get(r.getShoeType())+requestAmount);
+            if(b) {
+                restockRequests.put(r.getShoeType(), restockRequests.get(r.getShoeType()) + requestAmount);
+                System.out.println("We restock "+requestAmount+" "+r.getShoeType()+" but be aware that some of the shoes a kept for someone else");
+            }
             else
                 complete(r,false);
         }

@@ -38,9 +38,9 @@ public class WebsiteClientService extends MicroService {
 
             for(PurchaseSchedule ps : list){
                 if(ps.getTick() == c.getCurrentTick()){
-                    sendRequest(new PurchaseOrderRequest(getName(),ps.getShoeType(),false,currentTick),c1 -> {
-                        // TODO something when he buy !
-                    });
+                    sendRequest(new PurchaseOrderRequest(getName(),ps.getShoeType(),false,currentTick),c1 ->
+                        System.out.println(this.getName()+" is trying to buy "+ps.getShoeType())
+                    );
                 }
             }
         } );
@@ -50,6 +50,7 @@ public class WebsiteClientService extends MicroService {
                 sendRequest(new PurchaseOrderRequest(getName(),c.getShoeName(),true,currentTick),c1 ->{
                    if(c1!=null){
                        set.remove(c.getShoeName());
+                       System.out.println(this.getName()+" has successfully bought "+c.getShoeName());
                    }
                 });
             }

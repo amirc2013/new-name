@@ -32,14 +32,17 @@ public class SellingService extends MicroService {
                 Receipt r = new Receipt(super.getName(),c.getBuyer(),c.getShoeType(),false,this.currentTick,c.getRequestTick(),1);
                 myStore.file(r);
                 complete(c,r);
+                System.out.println(c.getBuyer() + " has bought "+c.getShoeType()+" successfully without Discount");
             }
             else if (result == Store.BuyResult.DISCOUNTED_PRICE) {
                 Receipt r = new Receipt(super.getName(),c.getBuyer(),c.getShoeType(),true,this.currentTick,c.getRequestTick(),1);
                 myStore.file(r);
                 complete(c,r);
+                System.out.println(c.getBuyer() + " has bought "+c.getShoeType()+" successfully with Discount ! woohoo");
             }
             else if(result == Store.BuyResult.NOT_ON_DISCOUNT){
                 complete(c,null);
+                System.out.println(c.getBuyer() + " has not bought "+c.getShoeType()+" since it does not has Discount");
             }
             else{ //result == Store.BuyResult.NOT_IN_STOCK
                 sendRequest(new RestockRequest(c.getShoeType()),c1 ->
@@ -48,9 +51,12 @@ public class SellingService extends MicroService {
                         Receipt r = new Receipt(super.getName(),c.getBuyer(),c.getShoeType(),false,this.currentTick,c.getRequestTick(),1);
                         myStore.file(r);
                         complete(c,r);
+                        System.out.println(c.getBuyer() + " has bought "+c.getShoeType()+" successfully without Discount (after Restock)");
                     }
                     else{
                         complete(c,null);
+                        System.out.println(c.getBuyer() + " has not bought "+c.getShoeType()+" since we dont have shoes of that kind left");
+
                     }
                 });
             }
