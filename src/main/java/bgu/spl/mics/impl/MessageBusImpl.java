@@ -1,4 +1,6 @@
-package bgu.spl.mics;
+package bgu.spl.mics.impl;
+
+import bgu.spl.mics.*;
 
 import java.util.Map;
 import java.util.Set;

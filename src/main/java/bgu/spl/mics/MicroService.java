@@ -1,5 +1,8 @@
 package bgu.spl.mics;
 
+import bgu.spl.mics.impl.MessageBusImpl;
+import bgu.spl.mics.impl.RequestCompleted;
+
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,4 +1,7 @@
-package bgu.spl.mics;
+package bgu.spl.mics.impl;
+
+import bgu.spl.mics.Message;
+import bgu.spl.mics.Request;
 
 public class RequestCompleted<T> implements Message {
 

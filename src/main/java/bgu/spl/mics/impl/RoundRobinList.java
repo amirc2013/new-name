@@ -1,4 +1,4 @@
-package bgu.spl.mics;
+package bgu.spl.mics.impl;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

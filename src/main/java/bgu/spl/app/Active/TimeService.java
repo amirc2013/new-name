@@ -10,12 +10,14 @@ public class TimeService implements Runnable{
 
     private int speed ;
     private int duration ;
+    private int currentTime;
 
     public TimeService(int speed, int duration) {
         if(speed<=0 && duration<=0)
             throw new RuntimeException("TimeService Arguments must be valid");
         this.speed = speed;
         this.duration = duration;
+        currentTime = 1;
     }
 
     @Override
@@ -24,8 +26,8 @@ public class TimeService implements Runnable{
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-
+                currentTime += 1;
             }
-        }, 22);
+        }, speed, speed*duration);
     }
 }
