@@ -36,8 +36,8 @@ public class ShoeStorageInfo {
         if(newStorage<newDiscount)
             throw new RuntimeException("Cant be more discounted shoes than shoes available on store");
         this.shoeType = shoesType;
-        amountOnStorage = newStorage;
-        discountedAmount = newDiscount;
+        this.amountOnStorage = newStorage;
+        this.discountedAmount = newDiscount;
     }
 
     public ShoeStorageInfo(StockInfo f) {
@@ -60,7 +60,7 @@ public class ShoeStorageInfo {
      * @return amount of shoes in this storage that can be sale in a discounted price.
      */
     public int getDiscountedAmount(){
-        return amountOnStorage;
+        return discountedAmount;
     }
 
     /**

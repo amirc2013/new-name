@@ -1,6 +1,7 @@
 package bgu.spl.app.Active;
 
 import bgu.spl.app.Messages.TickBroadcast;
+import bgu.spl.app.Passive.Store;
 import bgu.spl.mics.MicroService;
 
 import java.util.Timer;
@@ -35,6 +36,8 @@ public class TimeService extends MicroService{
                 System.out.println("Broadcast : The time now is "+currentTime);
                 if(currentTime >= duration){
                     System.out.println("TimeService terminating !");
+                    Store store = Store.getInstance();
+                    store.print();
                     t.cancel();
                     terminate();
                 }
