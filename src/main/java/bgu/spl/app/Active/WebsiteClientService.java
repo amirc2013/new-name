@@ -34,8 +34,21 @@ public class WebsiteClientService extends MicroService {
         Store myStore = Store.getInstance();
 
         //updating currTick
-        subscribeBroadcast(TickBroadcast.class, c ->
-        {
+        subscribeBroadcast(TickBroadcast.class, this::handleTicks);
+        subscribeBroadcast(NewDiscountBroadcast.class,this::handleDiscountBro);
+    }
+    private void handleDiscountBro(NewDiscountBroadcast c){
+            if(set.contains(c.getShoeName())){
+                sendRequest(new PurchaseOrderRequest(getName(),c.getShoeName(),true,currentTick),c1 ->{
+                    if(c1!=null){
+                        set.remove(c.getShoeName());
+                        System.out.println(this.getName()+" has successfully bought "+c.getShoeName());
+                    }
+                });
+            }
+    }
+
+    private void handleTicks(TickBroadcast c){
             this.currentTick = c.getCurrentTick();
 
             for(PurchaseSchedule ps : list){
@@ -46,17 +59,5 @@ public class WebsiteClientService extends MicroService {
                     );
                 }
             }
-        } );
-
-        subscribeBroadcast(NewDiscountBroadcast.class,c -> {
-            if(set.contains(c.getShoeName())){
-                sendRequest(new PurchaseOrderRequest(getName(),c.getShoeName(),true,currentTick),c1 ->{
-                   if(c1!=null){
-                       set.remove(c.getShoeName());
-                       System.out.println(this.getName()+" has successfully bought "+c.getShoeName());
-                   }
-                });
-            }
-        });
     }
 }

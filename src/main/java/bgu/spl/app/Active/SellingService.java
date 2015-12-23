@@ -24,7 +24,6 @@ public class SellingService extends MicroService {
     protected void initialize() {
         //updating currTick
         subscribeBroadcast(TickBroadcast.class,c -> this.currentTick = c.getCurrentTick() );
-
         subscribeRequest(PurchaseOrderRequest.class,this::handlePurchaseOrder);
     }
 
