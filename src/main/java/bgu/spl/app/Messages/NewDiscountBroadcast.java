@@ -7,4 +7,6 @@ import bgu.spl.mics.Message;
  * Created by Amir on 22/12/2015.
  */
 public class NewDiscountBroadcast implements Broadcast {
+
+
 }

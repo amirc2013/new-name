@@ -7,7 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Created by אמיר on 22/12/2015.
+ * Created by Amir on 22/12/2015.
  */
 public class TimeService extends MicroService{
 
