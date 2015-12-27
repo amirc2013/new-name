@@ -3,6 +3,7 @@ package bgu.spl.mics.impl;
 import bgu.spl.mics.*;
 
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,7 +58,10 @@ public class MessageBusImpl implements MessageBus {
         if(broadcastmap.containsKey(b.getClass()))
             for(MicroService m : broadcastmap.get(b.getClass()))
                 try {
-                    map.get(m).put(b);
+                    BlockingQueue<Message> q = map.get(m);
+                    if(q == null)
+                        throw new RuntimeException(m.getName()+" is not registered but trying to sendBroadcast");
+                    q.put(b);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
