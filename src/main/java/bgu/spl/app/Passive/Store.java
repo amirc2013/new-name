@@ -31,7 +31,6 @@ public class Store {
     //lockers
     Object receipts_lock;
 
-
     private Store(){
         storage = new ConcurrentHashMap<String, ShoeStorageInfo>();
         receipts = Collections.synchronizedList(new LinkedList<Receipt>());
