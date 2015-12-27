@@ -12,15 +12,18 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class MessageBusImpl implements MessageBus {
 
-    protected static MessageBus instance;
-    private MessageBusImpl() {
+    static class instanceHolder{
+        private static MessageBus instance = new MessageBusImpl();
     }
 
     public static MessageBus getInstance(){
-        if(instance == null)
-            instance = new MessageBusImpl();
-        return instance;
+        return instanceHolder.instance;
     }
+
+
+    private MessageBusImpl() {
+    }
+
 
     final Map<MicroService,BlockingQueue<Message>> map = new ConcurrentHashMap<>();
     final Map<Class<? extends Request>,RoundRobinList<MicroService>> requestmap = new ConcurrentHashMap<>();
