@@ -66,7 +66,8 @@ public class Store {
 
         }
         else{
-            throw new RuntimeException("Something went wrong - no such a shoes in the storage");    // we should not get into thiss error.
+           // throw new RuntimeException("Something went wrong - no such a shoes in the storage");    // we should not get into thiss error.
+         return BuyResult.NOT_IN_STOCK;
         }
     }
 
@@ -145,5 +146,7 @@ public class Store {
             }
         }
     }
+
+
 
 }
