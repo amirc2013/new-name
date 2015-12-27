@@ -6,6 +6,9 @@ import bgu.spl.app.Passive.DiscountSchedule;
 import bgu.spl.app.Passive.PurchaseSchedule;
 import bgu.spl.app.Passive.ShoeStorageInfo;
 import bgu.spl.app.Passive.Store;
+import bgu.spl.mics.MessageBus;
+import bgu.spl.mics.MicroService;
+import bgu.spl.mics.impl.MessageBusImpl;
 import com.google.gson.Gson;
 
 import java.io.FileNotFoundException;
@@ -18,9 +21,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-public class ShoeStoreRunner {
+public class ShoeStoreRunner{
 
     Store store = Store.getInstance();
+    CountDownLatch cdl;
 
     ExecutionInfo executionInfo;
     public ShoeStoreRunner(ExecutionInfo executionInfo) {
@@ -42,8 +46,6 @@ public class ShoeStoreRunner {
         }
     }
 
-
-
     private void execute() {
         initStorage(executionInfo.getInitialStorage());
         initServices(executionInfo.getServices());
@@ -55,39 +57,36 @@ public class ShoeStoreRunner {
     }
 
     void initServices(ServicesInfo info){
-        CountDownLatch cdl = new CountDownLatch(info.getSellers()+info.getFactories()+info.getCustomers().size()+1);
-        initManagerService(info.getManager(),cdl);
-        initFactories(info.getFactories(),cdl);
-        initSellers(info.getSellers(),cdl);
-        initCustomers(info.getCustomers(),cdl);
-        initTimerService(info.getTime(),cdl);
+        cdl = new CountDownLatch(info.getSellers()+info.getFactories()+info.getCustomers().size()+1);
+        initManagerService(info.getManager());
+        initFactories(info.getFactories());
+        initSellers(info.getSellers());
+        initCustomers(info.getCustomers());
+        initTimerService(info.getTime());
     }
 
-    private void initCustomers(List<CustomerInfo> customers, CountDownLatch cdl) {
-        ExecutorService service = Executors.newFixedThreadPool(customers.size());
+    private void initCustomers(List<CustomerInfo> customers) {
         for(CustomerInfo c : customers){
             List<PurchaseSchedule> purchaseSchedules = c.getPurchaseSchedule().stream().map(PurchaseSchedule::new).collect(Collectors.toCollection(LinkedList::new));
-            service.execute(new WebsiteClientService(c.getName(),purchaseSchedules, c.getWishList(),cdl));
+            new Thread(new WebsiteClientService(c.getName(),purchaseSchedules, c.getWishList(),cdl)).start();
         }
     }
 
-    private void initSellers(int sellers, CountDownLatch cdl) {
-        ExecutorService service = Executors.newFixedThreadPool(sellers);
+    private void initSellers(int sellers) {
         for(int i = 0 ; i < sellers ; i++)
-            service.execute(new SellingService("SellingService"+i,cdl));
+            new Thread(new SellingService("SellingService" + i, cdl)).start();
     }
 
-    private void initFactories(int factories, CountDownLatch cdl) {
-        ExecutorService service = Executors.newFixedThreadPool(factories);
+    private void initFactories(int factories) {
         for(int i = 0 ; i < factories ; i++)
-            service.execute(new ShoeFactoryService("ShoeFactoryService"+i,cdl));
+            new Thread(new ShoeFactoryService("ShoeFactoryService" + i, cdl)).start();
     }
 
-    private void initTimerService(TimeServiceInfo time, CountDownLatch cdl) {
+    private void initTimerService(TimeServiceInfo time) {
         new Thread(new TimeService(time.getSpeed(),time.getDuration(),cdl)).start();
     }
 
-    private void initManagerService(ManagerServiceInfo manager, CountDownLatch cdl) {
+    private void initManagerService(ManagerServiceInfo manager) {
         List<DiscountSchedule> shoeStorageInfos = manager.getDiscountSchedule().stream().map(DiscountSchedule::new).collect(Collectors.toCollection(LinkedList::new));
         new Thread(new ManagementService(shoeStorageInfos,cdl)).start();
     }

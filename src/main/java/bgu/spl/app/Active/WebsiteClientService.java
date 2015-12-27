@@ -21,9 +21,11 @@ public class WebsiteClientService extends MicroService {
     private int currentTick ;
     private List<PurchaseSchedule> list;
     private Set<String> set;
+    private CountDownLatch cdl;
 
     public WebsiteClientService(String name, List<PurchaseSchedule> list, Set<String> set, CountDownLatch cdl){
-        super(name, cdl);
+        super(name);
+        this.cdl = cdl;
         currentTick = 0 ;
         this.list = list;
         this.set = set;

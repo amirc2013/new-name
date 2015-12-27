@@ -17,9 +17,11 @@ public class TimeService extends MicroService{
     private int speed ;
     private int duration ;
     private volatile int currentTime;
+    private CountDownLatch cdl;
 
     public TimeService(int speed, int duration , CountDownLatch cdl) {
-        super("timer",cdl);
+        super("timer");
+        this.cdl = cdl;
         if(speed<=0 && duration<=0)
             throw new RuntimeException("TimeService Arguments must be valid");
         this.speed = speed;
@@ -40,9 +42,9 @@ public class TimeService extends MicroService{
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                currentTime += 1;
+                currentTime++;
                 sendBroadcast(new TickBroadcast(currentTime));
-                LOGGER.info("Broadcast : The time now is "+currentTime);
+                LOGGER.info("Broadcast : The time now is " + currentTime);
                 if(currentTime >= duration){
                     LOGGER.info("Termination Broadcast");
                     LOGGER.info("TimeService terminating !");

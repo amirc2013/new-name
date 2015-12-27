@@ -19,9 +19,11 @@ public class ShoeFactoryService extends MicroService{
 
     int completedShoes = 0;
     int currentTick;
+    private CountDownLatch cdl;
 
     public ShoeFactoryService(String name, CountDownLatch cdl) {
-        super(name, cdl);
+        super(name);
+        this.cdl = cdl;
     }
 
     @Override

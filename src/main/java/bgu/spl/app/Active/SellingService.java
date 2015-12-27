@@ -16,9 +16,11 @@ import java.util.concurrent.CountDownLatch;
 public class SellingService extends MicroService {
 
     private int currentTick ;
+    private CountDownLatch cdl;
 
     public SellingService(String name, CountDownLatch cdl){
-        super(name,cdl);
+        super(name);
+        this.cdl = cdl;
         currentTick = 0 ;
         LOGGER.info(this.getName()+" is here to serve our customer !");
     }

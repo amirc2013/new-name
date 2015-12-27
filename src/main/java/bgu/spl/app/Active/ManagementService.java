@@ -22,9 +22,12 @@ public class ManagementService extends MicroService {
     Store store = Store.getInstance();
 
     List<DiscountSchedule> schedule;
+    private CountDownLatch cdl;
+
     public ManagementService(List<DiscountSchedule> schedule, CountDownLatch cdl) {
-        super("manager", cdl);
+        super("manager");
         this.schedule = schedule;
+        this.cdl = cdl;
     }
 
     @Override
@@ -61,7 +64,7 @@ public class ManagementService extends MicroService {
             boolean b = sendRequest(request, this::onManufacturingOrderRequestCompleted);
             if(b) {
                 restockRequests.put(r.getShoeType(), restockRequests.get(r.getShoeType()) + requestAmount);
-                LOGGER.info("We restock "+requestAmount+" "+r.getShoeType()+" but be aware that some of the shoes a kept for someone else");
+                LOGGER.info("We restock " + requestAmount + " " + r.getShoeType() + " but be aware that some of the shoes a kept for someone else");
             }
             else
                 complete(r,false);
