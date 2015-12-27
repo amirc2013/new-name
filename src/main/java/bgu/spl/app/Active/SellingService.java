@@ -2,10 +2,13 @@ package bgu.spl.app.Active;
 
 import bgu.spl.app.Messages.PurchaseOrderRequest;
 import bgu.spl.app.Messages.RestockRequest;
+import bgu.spl.app.Messages.TerminationBroadcast;
 import bgu.spl.app.Messages.TickBroadcast;
 import bgu.spl.app.Passive.Receipt;
 import bgu.spl.app.Passive.Store;
 import bgu.spl.mics.MicroService;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Amir on 23/12/2015.
@@ -14,8 +17,8 @@ public class SellingService extends MicroService {
 
     private int currentTick ;
 
-    public SellingService(String name){
-        super(name);
+    public SellingService(String name, CountDownLatch cdl){
+        super(name,cdl);
         currentTick = 0 ;
         LOGGER.info(this.getName()+" is here to serve our customer !");
     }
@@ -25,6 +28,8 @@ public class SellingService extends MicroService {
         //updating currTick
         subscribeBroadcast(TickBroadcast.class,c -> this.currentTick = c.getCurrentTick() );
         subscribeRequest(PurchaseOrderRequest.class,this::handlePurchaseOrder);
+        subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
+        cdl.countDown();
     }
 
     private void handlePurchaseOrder(PurchaseOrderRequest c){
@@ -58,7 +63,6 @@ public class SellingService extends MicroService {
                     else{
                         complete(c,null);
                         LOGGER.info(c.getBuyer() + " has not bought "+c.getShoeType()+" since we dont have shoes of that kind left");
-
                     }
                 });
             }

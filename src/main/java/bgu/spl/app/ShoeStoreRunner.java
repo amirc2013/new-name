@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,40 +55,41 @@ public class ShoeStoreRunner {
     }
 
     void initServices(ServicesInfo info){
-        initManagerService(info.getManager());
-        initFactories(info.getFactories());
-        initSellers(info.getSellers());
-        initCustomers(info.getCustomers());
-        initTimerService(info.getTime());
+        CountDownLatch cdl = new CountDownLatch(info.getSellers()+info.getFactories()+info.getCustomers().size()+1);
+        initManagerService(info.getManager(),cdl);
+        initFactories(info.getFactories(),cdl);
+        initSellers(info.getSellers(),cdl);
+        initCustomers(info.getCustomers(),cdl);
+        initTimerService(info.getTime(),cdl);
     }
 
-    private void initCustomers(List<CustomerInfo> customers) {
+    private void initCustomers(List<CustomerInfo> customers, CountDownLatch cdl) {
         ExecutorService service = Executors.newFixedThreadPool(customers.size());
         for(CustomerInfo c : customers){
             List<PurchaseSchedule> purchaseSchedules = c.getPurchaseSchedule().stream().map(PurchaseSchedule::new).collect(Collectors.toCollection(LinkedList::new));
-            service.execute(new WebsiteClientService(c.getName(),purchaseSchedules, c.getWishList()));
+            service.execute(new WebsiteClientService(c.getName(),purchaseSchedules, c.getWishList(),cdl));
         }
     }
 
-    private void initSellers(int sellers) {
+    private void initSellers(int sellers, CountDownLatch cdl) {
         ExecutorService service = Executors.newFixedThreadPool(sellers);
         for(int i = 0 ; i < sellers ; i++)
-            service.execute(new SellingService("SellingService"+i));
+            service.execute(new SellingService("SellingService"+i,cdl));
     }
 
-    private void initFactories(int factories) {
+    private void initFactories(int factories, CountDownLatch cdl) {
         ExecutorService service = Executors.newFixedThreadPool(factories);
         for(int i = 0 ; i < factories ; i++)
-            service.execute(new ShoeFactoryService("ShoeFactoryService"+i));
+            service.execute(new ShoeFactoryService("ShoeFactoryService"+i,cdl));
     }
 
-    private void initTimerService(TimeServiceInfo time) {
-        new Thread(new TimeService(time.getSpeed(),time.getDuration())).start();
+    private void initTimerService(TimeServiceInfo time, CountDownLatch cdl) {
+        new Thread(new TimeService(time.getSpeed(),time.getDuration(),cdl)).start();
     }
 
-    private void initManagerService(ManagerServiceInfo manager) {
+    private void initManagerService(ManagerServiceInfo manager, CountDownLatch cdl) {
         List<DiscountSchedule> shoeStorageInfos = manager.getDiscountSchedule().stream().map(DiscountSchedule::new).collect(Collectors.toCollection(LinkedList::new));
-        new Thread(new ManagementService(shoeStorageInfos)).start();
+        new Thread(new ManagementService(shoeStorageInfos,cdl)).start();
     }
 
 

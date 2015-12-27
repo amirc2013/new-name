@@ -8,6 +8,7 @@ import bgu.spl.mics.MicroService;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by matan_000 on 23/12/2015.
@@ -19,8 +20,8 @@ public class ShoeFactoryService extends MicroService{
     int completedShoes = 0;
     int currentTick;
 
-    public ShoeFactoryService(String name) {
-        super(name);
+    public ShoeFactoryService(String name, CountDownLatch cdl) {
+        super(name, cdl);
     }
 
     @Override
@@ -28,6 +29,7 @@ public class ShoeFactoryService extends MicroService{
         subscribeBroadcast(TickBroadcast.class,this::handleTickBroadcast);
         subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
         subscribeRequest(ManufacturingOrderRequest.class, this::handleManufacturingOrderRequest);
+        cdl.countDown();
     }
 
     private void handleTickBroadcast(TickBroadcast tickBroadcast) {

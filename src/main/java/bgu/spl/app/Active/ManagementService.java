@@ -8,6 +8,7 @@ import bgu.spl.mics.MicroService;
 import bgu.spl.mics.Request;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by matan_000 on 23/12/2015.
@@ -21,8 +22,8 @@ public class ManagementService extends MicroService {
     Store store = Store.getInstance();
 
     List<DiscountSchedule> schedule;
-    public ManagementService(List<DiscountSchedule> schedule) {
-        super("manager");
+    public ManagementService(List<DiscountSchedule> schedule, CountDownLatch cdl) {
+        super("manager", cdl);
         this.schedule = schedule;
     }
 
@@ -31,6 +32,7 @@ public class ManagementService extends MicroService {
         subscribeBroadcast(TickBroadcast.class, this::handleTick);
         subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
         subscribeRequest(RestockRequest.class, this::handleRestockRequest);
+        cdl.countDown();
     }
 
     private void handleTick(TickBroadcast broadcast) {

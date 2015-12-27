@@ -6,6 +6,7 @@ import bgu.spl.mics.impl.RequestCompleted;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
 /**
@@ -31,12 +32,25 @@ public abstract class MicroService implements Runnable {
 
     private boolean terminated = false;
     private final String name;
+    protected CountDownLatch cdl; // for initialize
 
     MessageBus bus = MessageBusImpl.getInstance();
 
     Map<Request,Callback> requestCallbackMap = new HashMap<>();
     Map<Class<? extends Broadcast>,Callback> broadcastmap = new HashMap<>();
     Map<Class<? extends Request>,Callback> requestmap = new HashMap<>();
+
+
+    /**
+     * @param name the micro-service name (used mainly for debugging purposes -
+     *             does not have to be unique)
+     * @param cdl for syncing the INITIALIZATION
+     */
+    public MicroService(String name , CountDownLatch cdl) {
+        this.name = name;
+        LOGGER = PrettyLogger.getLogger(name);
+        this.cdl = cdl;
+    }
 
     /**
      * @param name the micro-service name (used mainly for debugging purposes -

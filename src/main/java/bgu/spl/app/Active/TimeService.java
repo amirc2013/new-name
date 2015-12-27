@@ -7,6 +7,7 @@ import bgu.spl.mics.MicroService;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
 /**
@@ -17,17 +18,23 @@ public class TimeService extends MicroService{
     private int duration ;
     private volatile int currentTime;
 
-    public TimeService(int speed, int duration) {
-        super("timer");
+    public TimeService(int speed, int duration , CountDownLatch cdl) {
+        super("timer",cdl);
         if(speed<=0 && duration<=0)
             throw new RuntimeException("TimeService Arguments must be valid");
         this.speed = speed;
         this.duration = duration;
-        currentTime = 1;
+        currentTime = 0;
     }
 
     @Override
     protected void initialize() {
+        try { // wait until all the services are ready !
+            cdl.await();
+            LOGGER.info("System has been Initialized !");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
         Timer t = new Timer();
         t.schedule(new TimerTask() {
@@ -37,9 +44,9 @@ public class TimeService extends MicroService{
                 sendBroadcast(new TickBroadcast(currentTime));
                 LOGGER.info("Broadcast : The time now is "+currentTime);
                 if(currentTime >= duration){
-                    sendBroadcast(new TerminationBroadcast());
                     LOGGER.info("Termination Broadcast");
                     LOGGER.info("TimeService terminating !");
+                    sendBroadcast(new TerminationBroadcast());
                     t.cancel();
                     terminate();
                 }

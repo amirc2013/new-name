@@ -2,6 +2,7 @@ package bgu.spl.app.Active;
 
 import bgu.spl.app.Messages.NewDiscountBroadcast;
 import bgu.spl.app.Messages.PurchaseOrderRequest;
+import bgu.spl.app.Messages.TerminationBroadcast;
 import bgu.spl.app.Messages.TickBroadcast;
 import bgu.spl.app.Passive.PurchaseSchedule;
 import bgu.spl.app.Passive.Store;
@@ -9,6 +10,7 @@ import bgu.spl.mics.MicroService;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Amir on 23/12/2015.
@@ -20,8 +22,8 @@ public class WebsiteClientService extends MicroService {
     private List<PurchaseSchedule> list;
     private Set<String> set;
 
-    public WebsiteClientService(String name, List<PurchaseSchedule> list, Set<String> set){
-        super(name);
+    public WebsiteClientService(String name, List<PurchaseSchedule> list, Set<String> set, CountDownLatch cdl){
+        super(name, cdl);
         currentTick = 0 ;
         this.list = list;
         this.set = set;
@@ -36,6 +38,8 @@ public class WebsiteClientService extends MicroService {
         //updating currTick
         subscribeBroadcast(TickBroadcast.class, this::handleTicks);
         subscribeBroadcast(NewDiscountBroadcast.class,this::handleDiscountBro);
+        subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
+        cdl.countDown();
     }
     private void handleDiscountBro(NewDiscountBroadcast c){
             if(set.contains(c.getShoeName())){
