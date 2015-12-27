@@ -6,9 +6,6 @@ import bgu.spl.app.Passive.DiscountSchedule;
 import bgu.spl.app.Passive.PurchaseSchedule;
 import bgu.spl.app.Passive.ShoeStorageInfo;
 import bgu.spl.app.Passive.Store;
-import bgu.spl.mics.MessageBus;
-import bgu.spl.mics.MicroService;
-import bgu.spl.mics.impl.MessageBusImpl;
 import com.google.gson.Gson;
 
 import java.io.FileNotFoundException;
@@ -16,9 +13,6 @@ import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class ShoeStoreRunner{

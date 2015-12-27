@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 public class TimeService extends MicroService{
     private int speed ;
     private int duration ;
-    private volatile int currentTime;
+    private int currentTime;
     private CountDownLatch cdl;
 
     public TimeService(int speed, int duration , CountDownLatch cdl) {

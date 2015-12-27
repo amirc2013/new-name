@@ -1,5 +1,8 @@
-package bgu.spl.app.Passive;
+package bgu.spl.test;
 
+import bgu.spl.app.Passive.Receipt;
+import bgu.spl.app.Passive.ShoeStorageInfo;
+import bgu.spl.app.Passive.Store;
 import org.junit.Before;
 import org.junit.Test;
 import org.omg.CORBA.portable.OutputStream;
