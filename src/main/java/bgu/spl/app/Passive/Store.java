@@ -101,7 +101,7 @@ public class Store {
             storage.get(shoeType).addNewShoes(amount);
         }
         if(amount>0)
-         System.out.println("Store : We added "+amount+" shoes of : "+shoeType);
+             System.out.println("Store : We added "+amount+" shoes of : "+shoeType);
     }
 
 
