@@ -16,11 +16,11 @@ import java.util.logging.Logger;
  * <p>
  * Derived classes of MicroService should never directly touch the message-bus.
  * Instead, they have a set of internal protected wrapping methods (e.g.,
- * {@link #sendBroadcast(bgu.spl.mics.Broadcast)}, {@link #sendBroadcast(bgu.spl.mics.Broadcast)},
+ * {@link #sendBroadcast(Broadcast)}, {@link #sendBroadcast(Broadcast)},
  * etc.) they can use . When subscribing to message-types,
  * the derived class also supplies a {@link Callback} that should be called when
  * a message of the subscribed type was taken from the micro-service
- * message-queue (see {@link MessageBus#register(bgu.spl.mics.MicroService)}
+ * message-queue (see {@link MessageBus#register(MicroService)}
  * method). The abstract MicroService stores this callback together with the
  * type of the
  * message is related to.
@@ -59,7 +59,7 @@ public abstract class MicroService implements Runnable {
      * <p>
      * for a received message {@code m} of type {@code type = m.getClass()}
      * calling the callback {@code callback} means running the method
-     * {@link Callback#call(java.lang.Object)} by calling
+     * {@link Callback#call(Object)} by calling
      * {@code callback.call(m)}.
      * <p>
      * @param <R>      the type of request to subscribe to
@@ -84,7 +84,7 @@ public abstract class MicroService implements Runnable {
      * <p>
      * for a received message {@code m} of type {@code type = m.getClass()}
      * calling the callback {@code callback} means running the method
-     * {@link Callback#call(java.lang.Object)} by calling
+     * {@link Callback#call(Object)} by calling
      * {@code callback.call(m)}.
      * <p>
      * @param <B>      the type of broadcast message to subscribe to
@@ -110,7 +110,7 @@ public abstract class MicroService implements Runnable {
      * @param r          the request to send
      * @param onComplete the callback to call when {@code r} is completed. This
      *                   callback expects to receive (i.e., in the
-     *                   {@link Callback#call(java.lang.Object)} first argument)
+     *                   {@link Callback#call(Object)} first argument)
      *                   the result provided when the micro-service receiving {@code r} completes
      *                   it.
      * @return true if there was at least one micro-service subscribed to

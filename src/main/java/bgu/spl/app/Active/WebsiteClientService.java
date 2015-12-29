@@ -60,7 +60,8 @@ public class WebsiteClientService extends MicroService {
             for(PurchaseSchedule ps : list){
                 if(ps.getTick() == c.getCurrentTick()){
                     LOGGER.info(this.getName()+" is trying to buy "+ps.getShoeType());
-                    sendRequest(new PurchaseOrderRequest(getName(),ps.getShoeType(),false,currentTick),c1 -> {
+                    sendRequest(new PurchaseOrderRequest(getName(),ps.getShoeType(),false,currentTick),c1 -> { 
+                    	
                             }
                     );
                 }

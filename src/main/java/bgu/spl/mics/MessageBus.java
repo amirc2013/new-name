@@ -70,7 +70,7 @@ public interface MessageBus {
 
     /**
      * remove the message queue allocated to {@code m} via the call to
-     * {@link #register(bgu.spl.mics.MicroService)} and clean all references
+     * {@link #register(MicroService)} and clean all references
      * related to {@code m} in this message-bus. If {@code m} was not
      * registered, nothing should happen.
      * <p>

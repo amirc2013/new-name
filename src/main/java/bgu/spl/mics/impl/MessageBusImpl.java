@@ -1,5 +1,6 @@
 package bgu.spl.mics.impl;
 
+import bgu.spl.app.Messages.RestockRequest;
 import bgu.spl.mics.*;
 
 import java.util.Map;

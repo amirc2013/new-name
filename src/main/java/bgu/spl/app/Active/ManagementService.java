@@ -54,6 +54,7 @@ public class ManagementService extends MicroService {
     }
 
     private void handleRestockRequest(RestockRequest r) {
+    	LOGGER.info("Handling Restock Request");
         recentRequests.add(r);
         if(!restockRequests.containsKey(r.getShoeType()))
             restockRequests.put(r.getShoeType(),-1);
@@ -66,8 +67,10 @@ public class ManagementService extends MicroService {
                 restockRequests.put(r.getShoeType(), restockRequests.get(r.getShoeType()) + requestAmount);
                 LOGGER.info("We restock " + requestAmount + " " + r.getShoeType() + " but be aware that some of the shoes a kept for someone else");
             }
-            else
+            else{
+            	LOGGER.info("No restock for : "+ r.getShoeType());
                 complete(r,false);
+            }
         }
     }
 

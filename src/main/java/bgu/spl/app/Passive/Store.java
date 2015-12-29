@@ -51,24 +51,28 @@ public class Store {
 
     public BuyResult take(String shoeType , boolean onlyDiscount) {
         ShoeStorageInfo shoe = storage.get(shoeType);
-        if(shoe != null){
-            boolean discounted = false;
-            if(shoe.getDiscountedAmount()>0)
-                discounted = true;
+        
+        	if(shoe != null){
+        		synchronized(shoe){
+        		boolean discounted = false;
+        		if(shoe.getDiscountedAmount()>0)
+        			discounted = true;
 
-            boolean ok = shoe.buyShoe(onlyDiscount);
+        		boolean ok = shoe.buyShoe(onlyDiscount);
 
-            if(!ok && onlyDiscount) return BuyResult.NOT_ON_DISCOUNT;
-            else if(ok && onlyDiscount) return  BuyResult.DISCOUNTED_PRICE;
-            else if(ok && !onlyDiscount && !discounted) return  BuyResult.REGULAR_PRICE;
-            else if(ok && !onlyDiscount && discounted) return  BuyResult.DISCOUNTED_PRICE;
-            else return BuyResult.NOT_IN_STOCK;
-
-        }
-        else{
-           // throw new RuntimeException("Something went wrong - no such a shoes in the storage");    // we should not get into thiss error.
-         return BuyResult.NOT_IN_STOCK;
-        }
+	            if(!ok && onlyDiscount) return BuyResult.NOT_ON_DISCOUNT;
+	            else if(ok && onlyDiscount) return  BuyResult.DISCOUNTED_PRICE;
+	            else if(ok && !onlyDiscount && !discounted) return  BuyResult.REGULAR_PRICE;
+	            else if(ok && !onlyDiscount && discounted) return  BuyResult.DISCOUNTED_PRICE;
+	            else return BuyResult.NOT_IN_STOCK;
+	
+        		}
+        	}
+	        else{
+	           // throw new RuntimeException("Something went wrong - no such a shoes in the storage");    // we should not get into thiss error.
+	         return BuyResult.NOT_IN_STOCK;
+	        }
+        
     }
 
 

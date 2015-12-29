@@ -124,8 +124,11 @@ public class ShoeStorageInfo {
      */
     public synchronized void addNewDiscountedShoes(int newAmount){
         // checking correctness
-        if (newAmount < 0) {throw new NegativeNumber();}
-        if (newAmount+this.discountedAmount > amountOnStorage) {throw new RuntimeException("YOU WANT More discounted shoes than we have in our storage ?");}
+
+       
+        if (newAmount < 0) throw new NegativeNumber();
+        
+        if (newAmount+discountedAmount > amountOnStorage) discountedAmount=amountOnStorage;
 
 
         this.discountedAmount = newAmount;
@@ -138,11 +141,11 @@ public class ShoeStorageInfo {
      * @throws NotEnoughItem
      * @throws NegativeNumber
      */
-    public synchronized boolean isDiscounted(){
+    public boolean isDiscounted(){
         return discountedAmount>0;
     }
 
-    public synchronized boolean isAvailable(){
+    public boolean isAvailable(){
         return amountOnStorage>0;
     }
 
