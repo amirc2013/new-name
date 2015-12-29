@@ -17,7 +17,7 @@ public class ManagementService extends MicroService {
 
     int currentTick;
     Map<String,Integer> restockRequests = new HashMap<>();
-    Set<RestockRequest> recentRequests = new TreeSet<>();
+    Set<RestockRequest> recentRequests = new HashSet<>();
 
     Store store = Store.getInstance();
 
@@ -75,6 +75,7 @@ public class ManagementService extends MicroService {
     }
 
     private void onManufacturingOrderRequestCompleted(Receipt receipt) {
+        LOGGER.info("Manufacturing Order Request Completed");
         store.add(receipt.getShoeType(),receipt.getAmountSold()-recentRequests.size());
         store.file(receipt);
         for(RestockRequest r : recentRequests){

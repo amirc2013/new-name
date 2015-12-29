@@ -197,6 +197,10 @@ public abstract class MicroService implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            catch (RuntimeException e){
+                LOGGER.severe(e.getMessage());
+                e.printStackTrace();
+            }
         }
         LOGGER.info("ended");
         bus.unregister(this);
