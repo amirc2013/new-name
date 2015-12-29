@@ -112,12 +112,12 @@ public class Store {
      */
     public void addDiscount(String shoeType, int amount){
         if(!storage.containsKey(shoeType)){
-           throw new RuntimeException("no such a shoe \" "+shoeType+"\" in our storage !");
+          LOGGER.info("Someone tried tried to add discount to something we don't own in our store");
         }
         else{
             storage.get(shoeType).addNewDiscountedShoes(amount);
         }
-        LOGGER.info("Store : "+amount+" DISCOUNTED shoes of : "+shoeType+" has been added");
+        LOGGER.info("Store : "+storage.get(shoeType).getDiscountedAmount()+" DISCOUNTED shoes of : "+shoeType+" has been added");
     }
 
     /**

@@ -9,6 +9,7 @@ import bgu.spl.app.Passive.Store;
 import bgu.spl.mics.MicroService;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Amir on 23/12/2015.
@@ -35,40 +36,40 @@ public class SellingService extends MicroService {
     }
 
     private void handlePurchaseOrder(PurchaseOrderRequest c){
+        try {
             Store myStore = Store.getInstance();
-            Store.BuyResult result = myStore.take(c.getShoeType(),c.isOnlyDiscount());
-            if (result == Store.BuyResult.REGULAR_PRICE){
-                Receipt r = new Receipt(super.getName(),c.getBuyer(),c.getShoeType(),false,this.currentTick,c.getRequestTick(),1);
+            Store.BuyResult result = myStore.take(c.getShoeType(), c.isOnlyDiscount());
+            if (result == Store.BuyResult.REGULAR_PRICE) {
+                Receipt r = new Receipt(super.getName(), c.getBuyer(), c.getShoeType(), false, this.currentTick, c.getRequestTick(), 1);
                 myStore.file(r);
-                complete(c,r);
-                LOGGER.info(c.getBuyer() + " has bought "+c.getShoeType()+" successfully without Discount");
-            }
-            else if (result == Store.BuyResult.DISCOUNTED_PRICE) {
-                Receipt r = new Receipt(super.getName(),c.getBuyer(),c.getShoeType(),true,this.currentTick,c.getRequestTick(),1);
+                complete(c, r);
+                LOGGER.info(c.getBuyer() + " has bought " + c.getShoeType() + " successfully without Discount");
+            } else if (result == Store.BuyResult.DISCOUNTED_PRICE) {
+                Receipt r = new Receipt(super.getName(), c.getBuyer(), c.getShoeType(), true, this.currentTick, c.getRequestTick(), 1);
                 myStore.file(r);
-                complete(c,r);
-                LOGGER.info(c.getBuyer() + " has bought "+c.getShoeType()+" successfully with Discount ! woohoo");
-            }
-            else if(result == Store.BuyResult.NOT_ON_DISCOUNT){
-                complete(c,null);
-                LOGGER.info(c.getBuyer() + " has not bought "+c.getShoeType()+" since it does not have Discount");
-            }
-            else{ //result == Store.BuyResult.NOT_IN_STOCK
-                LOGGER.info("Sending restock request for : "+c.getShoeType());
-            	sendRequest(new RestockRequest(c.getShoeType()),c1 ->
+                complete(c, r);
+                LOGGER.info(c.getBuyer() + " has bought " + c.getShoeType() + " successfully with Discount ! woohoo");
+            } else if (result == Store.BuyResult.NOT_ON_DISCOUNT) {
+                complete(c, null);
+                LOGGER.info(c.getBuyer() + " has not bought " + c.getShoeType() + " since it does not have Discount");
+            } else { //result == Store.BuyResult.NOT_IN_STOCK
+                LOGGER.info("Sending restock request for : " + c.getShoeType());
+                sendRequest(new RestockRequest(c.getShoeType()), c1 ->
                 {
-                    if(c1){
-                        Receipt r = new Receipt(super.getName(),c.getBuyer(),c.getShoeType(),false,this.currentTick,c.getRequestTick(),1);
+                    if (c1) {
+                        Receipt r = new Receipt(super.getName(), c.getBuyer(), c.getShoeType(), false, this.currentTick, c.getRequestTick(), 1);
                         myStore.file(r);
-                        complete(c,r);
-                        LOGGER.info(c.getBuyer() + " has bought "+c.getShoeType()+" successfully without Discount (after Restock)");
-                    }
-                    else{
-                        complete(c,null);
-                        LOGGER.info(c.getBuyer() + " has not bought "+c.getShoeType()+" since we dont have shoes of that kind left");
+                        complete(c, r);
+                        LOGGER.info(c.getBuyer() + " has bought " + c.getShoeType() + " successfully without Discount (after Restock)");
+                    } else {
+                        complete(c, null);
+                        LOGGER.info(c.getBuyer() + " has not bought " + c.getShoeType() + " since we dont have shoes of that kind left");
                     }
                 });
             }
+        } catch (Exception e){
+            LOGGER.info(e.getMessage());
+        }
 
     }
 

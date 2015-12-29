@@ -130,8 +130,8 @@ public class ShoeStorageInfo {
         
         if (newAmount+discountedAmount > amountOnStorage) discountedAmount=amountOnStorage;
 
-
-        this.discountedAmount = newAmount;
+        else
+            this.discountedAmount = newAmount;
     }
 
 
@@ -154,27 +154,33 @@ public class ShoeStorageInfo {
      * @return true if you bought someting succefully
      * @param wantDiscount
      */
-    public boolean  buyShoe(boolean wantDiscount){
-        if(amountOnStorage<0)
-            throw new NotEnoughShoesToBuy("We don't have "+shoeType+" shoes to sell!");
+    public synchronized boolean  buyShoe(boolean wantDiscount){
+        if(amountOnStorage<0) {
+            System.out.println("Shoes Info : "+getShoeType()+" has : TOTAL-"+amountOnStorage+ " , DISCOUNTED-"+discountedAmount);
+            throw new NotEnoughShoesToBuy("We don1't have " + shoeType + " shoes to sell!");
+        }
         else if(discountedAmount>0) {
             this.discountedAmount--;
             this.amountOnStorage--;
-            //System.out.println("Shoes Info : "+getShoeType()+" has : TOTAL-"+amountOnStorage+ " , DISCOUNTED-"+discountedAmount);
+            System.out.println("Shoes Info : "+getShoeType()+" has : TOTAL-"+amountOnStorage+ " , DISCOUNTED-"+discountedAmount);
             return true;
         }
         else if (!wantDiscount && discountedAmount==0 && amountOnStorage>0 ) {
             this.amountOnStorage--;
-            //System.out.println("Shoes Info : "+getShoeType()+" has : TOTAL-"+amountOnStorage +" , DISCOUNTED-"+discountedAmount);
+            System.out.println("Shoes Info : "+getShoeType()+" has : TOTAL-"+amountOnStorage +" , DISCOUNTED-"+discountedAmount);
+            System.out.println(amountOnStorage +" "+ discountedAmount);
+
             return true;
         }
         else{ //!wantDiscount && discountedAmount==0 && amountOnStorage==0
+
+            System.out.println("Shoes Info : "+getShoeType()+" has : TOTAL-"+amountOnStorage+ " , DISCOUNTED-"+discountedAmount);
             return false;
         }
     }
 
 
-    public void resetDiscounted(){
+    public synchronized void resetDiscounted(){
         this.discountedAmount = 0;
     }
 }
