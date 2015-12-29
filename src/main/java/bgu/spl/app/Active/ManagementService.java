@@ -16,8 +16,8 @@ import java.util.concurrent.CountDownLatch;
 public class ManagementService extends MicroService {
 
     int currentTick;
-    Map<String,Integer> restockRequests = new HashMap<String,Integer>();
-    Set<RestockRequest> recentRequests = new LinkedHashSet<>();
+    Map<String,Integer> restockRequests = new HashMap<>();
+    Set<RestockRequest> recentRequests = new HashSet<>();
 
     Store store = Store.getInstance();
 
@@ -54,19 +54,18 @@ public class ManagementService extends MicroService {
     }
 
     private void handleRestockRequest(RestockRequest r) {
-    	LOGGER.info("Handling Restock Request !!!! ");
+    	LOGGER.info("Handling Restock Request");
         recentRequests.add(r);
         if(!restockRequests.containsKey(r.getShoeType()))
             restockRequests.put(r.getShoeType(),-1);
         restockRequests.put(r.getShoeType(),restockRequests.get(r.getShoeType())-1);
         if(restockRequests.get(r.getShoeType()) < 0 ){
             int requestAmount = currentTick % 5 + 1;
-            LOGGER.info("Sending request to manufactories !");
             Request<Receipt> request = new ManufacturingOrderRequest(r.getShoeType(),requestAmount,currentTick);
             boolean b = sendRequest(request, this::onManufacturingOrderRequestCompleted);
             if(b) {
                 restockRequests.put(r.getShoeType(), restockRequests.get(r.getShoeType()) + requestAmount);
-                LOGGER.info("We are restocking " + requestAmount + " " + r.getShoeType() + " but be aware that some of the shoes are kept for someone else");
+                LOGGER.info("We restock " + requestAmount + " " + r.getShoeType() + " but be aware that some of the shoes a kept for someone else");
             }
             else{
             	LOGGER.info("No restock for : "+ r.getShoeType());
@@ -76,6 +75,7 @@ public class ManagementService extends MicroService {
     }
 
     private void onManufacturingOrderRequestCompleted(Receipt receipt) {
+        LOGGER.info("Manufacturing Order Request Completed");
         store.add(receipt.getShoeType(),receipt.getAmountSold()-recentRequests.size());
         store.file(receipt);
         for(RestockRequest r : recentRequests){
