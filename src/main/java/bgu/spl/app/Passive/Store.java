@@ -54,18 +54,18 @@ public class Store {
         
         	if(shoe != null){
         		synchronized(shoe){
-        		boolean discounted = false;
-        		if(shoe.getDiscountedAmount()>0)
-        			discounted = true;
+                    boolean discounted = false;
+                    if(shoe.getDiscountedAmount()>0)
+                        discounted = true;
 
-        		boolean ok = shoe.buyShoe(onlyDiscount);
+                    boolean ok = shoe.buyShoe(onlyDiscount);
 
-	            if(!ok && onlyDiscount) return BuyResult.NOT_ON_DISCOUNT;
-	            else if(ok && onlyDiscount) return  BuyResult.DISCOUNTED_PRICE;
-	            else if(ok && !onlyDiscount && !discounted) return  BuyResult.REGULAR_PRICE;
-	            else if(ok && !onlyDiscount && discounted) return  BuyResult.DISCOUNTED_PRICE;
-	            else return BuyResult.NOT_IN_STOCK;
-	
+                    if(!ok && onlyDiscount) return BuyResult.NOT_ON_DISCOUNT;
+                    else if(ok && onlyDiscount) return  BuyResult.DISCOUNTED_PRICE;
+                    else if(ok && !onlyDiscount && !discounted) return  BuyResult.REGULAR_PRICE;
+                    else if(ok && !onlyDiscount && discounted) return  BuyResult.DISCOUNTED_PRICE;
+                    else return BuyResult.NOT_IN_STOCK;
+
         		}
         	}
 	        else{
@@ -100,7 +100,7 @@ public class Store {
         else{
             storage.get(shoeType).addNewShoes(amount);
         }
-        System.out.println("Store : We added "+amount+" shoes of : "+shoeType);
+        LOGGER.info("Store : We added "+amount+" shoes of : "+shoeType);
     }
 
 
@@ -133,19 +133,19 @@ public class Store {
 
         synchronized (storage){
             for (Map.Entry<String,ShoeStorageInfo> s : storage.entrySet()){
-                synchronized (System.out) {
-                    System.out.println("Shoe Type : "+s.getKey()+" : Amount of shoes - "+s.getValue().getAmountOfShoes()
-                            +" , Amount of discounted shoes - "+s.getValue().getDiscountedAmount());
+                synchronized (LOGGER) {
+                    LOGGER.info("Shoe Type : " + s.getKey() + " : Amount of shoes - " + s.getValue().getAmountOfShoes()
+                            + " , Amount of discounted shoes - " + s.getValue().getDiscountedAmount());
                 }
             }
         }
 
         synchronized (receipts){
             for (Receipt r : receipts){
-                synchronized (System.out) {
-                    System.out.println("Seller : "+r.getSeller()+" , Customer : "+r.getCustomer()+" , Shoe Type : "+r.getShoeType()
-                            +" , isDiscounted:"+r.isDiscount()+" , Issued Tick : "+r.getIssuedTick()+" , Request Tick : "+
-                            r.getRequestTick()+" , Amount Sold : "+r.getAmountSold());
+                synchronized (LOGGER) {
+                    LOGGER.info("Seller : " + r.getSeller() + " , Customer : " + r.getCustomer() + " , Shoe Type : " + r.getShoeType()
+                            + " , isDiscounted:" + r.isDiscount() + " , Issued Tick : " + r.getIssuedTick() + " , Request Tick : " +
+                            r.getRequestTick() + " , Amount Sold : " + r.getAmountSold());
                 }
             }
         }

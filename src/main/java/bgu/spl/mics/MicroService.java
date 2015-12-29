@@ -194,10 +194,7 @@ public abstract class MicroService implements Runnable {
                     Broadcast request = (Broadcast)m;
                     broadcastmap.get(request.getClass()).call(request);
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            catch (RuntimeException e){
+            } catch (InterruptedException | RuntimeException e) {
                 LOGGER.severe(e.getMessage());
                 e.printStackTrace();
             }
