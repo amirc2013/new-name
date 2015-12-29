@@ -21,7 +21,7 @@
 "name": "Bruria",
 "wishList": ["green-flip-flops"],
 "purchaseSchedule": [
-{"shoeType": "red-boots", "tick": 3}
+  {"shoeType": "red-boots", "tick": 3}
 ]
 },
 {

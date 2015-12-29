@@ -51,7 +51,7 @@ public class SellingService extends MicroService {
                 LOGGER.info(c.getBuyer() + " has bought " + c.getShoeType() + " successfully with Discount ! woohoo");
             } else if (result == Store.BuyResult.NOT_ON_DISCOUNT) {
                 complete(c, null);
-                LOGGER.info(c.getBuyer() + " has not bought " + c.getShoeType() + " since it does not have Discount");
+                LOGGER.info(c.getBuyer() + " has not bought " + c.getShoeType() + " since it does not have anymore Discount ");
             } else { //result == Store.BuyResult.NOT_IN_STOCK
                 LOGGER.info("Sending restock request for : " + c.getShoeType());
                 sendRequest(new RestockRequest(c.getShoeType()), c1 ->
