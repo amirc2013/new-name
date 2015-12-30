@@ -1,6 +1,7 @@
 package bgu.spl.app.Passive;
 
 
+import bgu.spl.Exception.NegativeNumber;
 import bgu.spl.Exception.NoDiscountedShoe;
 import bgu.spl.Exception.NotOwnTheShoe;
 import bgu.spl.app.PrettyLogger;
@@ -51,7 +52,7 @@ public class Store {
 
 
 
-    public BuyResult take(String shoeType , boolean onlyDiscount) {
+    public BuyResult take(String shoeType , boolean onlyDiscount) throws NotOwnTheShoe {
         ShoeStorageInfo shoe = storage.get(shoeType);
         
         	if(shoe != null){
@@ -96,14 +97,19 @@ public class Store {
      * @param amount
      */
     public void add(String shoeType, int amount) {
-        if(!storage.containsKey(shoeType)){
-            storage.put(shoeType, new ShoeStorageInfo(shoeType,amount,0));
+        try {
+            if(!storage.containsKey(shoeType)){
+              storage.put(shoeType, new ShoeStorageInfo(shoeType,amount,0));
+            }
+            else{
+                storage.get(shoeType).addNewShoes(amount);
+
+            }
+            if(amount>0)
+              System.out.println("Store : We added "+amount+" shoes of : "+shoeType);
+        } catch (NegativeNumber negativeNumber) {
+            negativeNumber.printStackTrace();
         }
-        else{
-            storage.get(shoeType).addNewShoes(amount);
-        }
-        if(amount>0)
-             System.out.println("Store : We added "+amount+" shoes of : "+shoeType);
     }
 
 
@@ -113,13 +119,17 @@ public class Store {
      * @param shoeType
      * @param amount
      */
-    public void addDiscount(String shoeType, int amount){
+    public void addDiscount(String shoeType, int amount) throws NoDiscountedShoe{
         if(!storage.containsKey(shoeType)){
         //  LOGGER.info("Someone tried to add discount to something we don't own in our store");
             throw new NoDiscountedShoe("Someone tried to add discount to something we don't own in our store");
         }
-        else{
-            storage.get(shoeType).addNewDiscountedShoes(amount);
+        else {
+            try {
+                storage.get(shoeType).addNewDiscountedShoes(amount);
+            } catch (NegativeNumber negativeNumber) {
+                throw new NoDiscountedShoe("Someone tried to add a negative discount ");
+            }
         }
         LOGGER.info("Store : "+storage.get(shoeType).getDiscountedAmount()+" DISCOUNTED shoes of : "+shoeType+" has been added");
     }
