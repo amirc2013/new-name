@@ -100,7 +100,7 @@ public class Store {
         else{
             storage.get(shoeType).addNewShoes(amount);
         }
-        System.out.println("Store : We added "+amount+" shoes of : "+shoeType);
+        LOGGER.info("Store : We added "+amount+" shoes of : "+shoeType);
     }
 
 
@@ -117,7 +117,7 @@ public class Store {
         else{
             storage.get(shoeType).addNewDiscountedShoes(amount);
         }
-        LOGGER.info("Store : "+storage.get(shoeType).getDiscountedAmount()+" DISCOUNTED shoes of : "+shoeType+" has been added");
+        LOGGER.info(storage.get(shoeType).getDiscountedAmount()+" DISCOUNTED shoes of : "+shoeType+" has been added");
     }
 
     /**
