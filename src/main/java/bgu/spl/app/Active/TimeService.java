@@ -18,14 +18,16 @@ public class TimeService extends MicroService{
     private int duration ;
     private int currentTime;
     private CountDownLatch cdl;
+    private CountDownLatch ender;
 
-    public TimeService(int speed, int duration , CountDownLatch cdl) {
+    public TimeService(int speed, int duration , CountDownLatch cdl, CountDownLatch ender) {
         super("timer");
         this.cdl = cdl;
         if(speed<=0 && duration<=0)
             throw new RuntimeException("TimeService Arguments must be valid");
         this.speed = speed;
         this.duration = duration;
+        this.ender = ender;
         currentTime = 0;
     }
 
@@ -50,7 +52,14 @@ public class TimeService extends MicroService{
                     LOGGER.info("TimeService terminating !");
                     sendBroadcast(new TerminationBroadcast());
                     t.cancel();
+                    try {
+                        ender.await();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Store.getInstance().print();
                     terminate();
+
                 }
             }
         }, 0, speed);

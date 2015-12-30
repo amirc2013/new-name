@@ -1,6 +1,8 @@
 package bgu.spl.app.Passive;
 
 
+import bgu.spl.Exception.NoDiscountedShoe;
+import bgu.spl.Exception.NotOwnTheShoe;
 import bgu.spl.app.PrettyLogger;
 
 import java.util.*;
@@ -69,8 +71,8 @@ public class Store {
         		}
         	}
 	        else{
-	           // throw new RuntimeException("Something went wrong - no such a shoes in the storage");    // we should not get into thiss error.
-	         return BuyResult.NOT_IN_STOCK;
+	           throw new NotOwnTheShoe("We dont have this shoe in our store !");    // we should not get into thiss error.
+
 	        }
         
     }
@@ -113,7 +115,8 @@ public class Store {
      */
     public void addDiscount(String shoeType, int amount){
         if(!storage.containsKey(shoeType)){
-          LOGGER.info("Someone tried tried to add discount to something we don't own in our store");
+        //  LOGGER.info("Someone tried to add discount to something we don't own in our store");
+            throw new NoDiscountedShoe("Someone tried to add discount to something we don't own in our store");
         }
         else{
             storage.get(shoeType).addNewDiscountedShoes(amount);

@@ -19,6 +19,7 @@ public class ShoeStoreRunner{
 
     Store store = Store.getInstance();
     CountDownLatch cdl;
+    CountDownLatch ender;
 
     ExecutionInfo executionInfo;
     public ShoeStoreRunner(ExecutionInfo executionInfo) {
@@ -67,8 +68,9 @@ public class ShoeStoreRunner{
     }
 
     private void initSellers(int sellers) {
+        ender = new CountDownLatch(sellers);
         for(int i = 0 ; i < sellers ; i++)
-            new Thread(new SellingService("SellingService" + i, cdl)).start();
+            new Thread(new SellingService("SellingService" + i, cdl, ender)).start();
     }
 
     private void initFactories(int factories) {
@@ -77,7 +79,7 @@ public class ShoeStoreRunner{
     }
 
     private void initTimerService(TimeServiceInfo time) {
-        new Thread(new TimeService(time.getSpeed(),time.getDuration(),cdl)).start();
+        new Thread(new TimeService(time.getSpeed(),time.getDuration(),cdl,ender)).start();
     }
 
     private void initManagerService(ManagerServiceInfo manager) {
