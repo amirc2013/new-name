@@ -65,7 +65,8 @@ public class ManagementService extends MicroService {
             boolean b = sendRequest(request, this::onManufacturingOrderRequestCompleted);
             if(b) {
                 restockRequests.put(r.getShoeType(), restockRequests.get(r.getShoeType()) + requestAmount);
-                LOGGER.info("We restock " + requestAmount + " " + r.getShoeType() + " but be aware that some of the shoes a kept for someone else");
+                if(requestAmount>1)
+                LOGGER.info("We restocked " + requestAmount + " " + r.getShoeType() + " , be aware that some of the shoes are kept for someone else already");
             }
             else{
             	LOGGER.info("No restock for : "+ r.getShoeType());

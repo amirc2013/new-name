@@ -100,7 +100,7 @@ public class Store {
         else{
             storage.get(shoeType).addNewShoes(amount);
         }
-        LOGGER.info("Store : We added "+amount+" shoes of : "+shoeType);
+        System.out.println("Store : We added "+amount+" shoes of : "+shoeType);
     }
 
 
