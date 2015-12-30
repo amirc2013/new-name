@@ -32,7 +32,9 @@ public class ShoeStorageInfo {
      * @param newStorage
      * @param newDiscount
      */
-    public ShoeStorageInfo(String shoesType, int newStorage,int newDiscount){
+    public ShoeStorageInfo(String shoesType, int newStorage,int newDiscount) throws NegativeNumber{
+        if(newStorage<0)
+            throw  new NegativeNumber();
         if(newStorage<newDiscount)
             throw new RuntimeException("Cant be more discounted shoes than shoes available on store");
         this.shoeType = shoesType;
@@ -109,7 +111,7 @@ public class ShoeStorageInfo {
      * @param newAmount
      * @throws NegativeNumber
      */
-    public synchronized void addNewShoes(int newAmount){
+    public synchronized void addNewShoes(int newAmount) throws NegativeNumber{
         // checking correctness
         if (newAmount < 0) {throw new NegativeNumber();}
 
@@ -122,7 +124,7 @@ public class ShoeStorageInfo {
      * @throws NotEnoughItem
      * @throws NegativeNumber
      */
-    public synchronized void addNewDiscountedShoes(int newAmount){
+    public synchronized void addNewDiscountedShoes(int newAmount)throws  NegativeNumber{
         // checking correctness
 
        
@@ -145,9 +147,6 @@ public class ShoeStorageInfo {
         return discountedAmount>0;
     }
 
-    public boolean isAvailable(){
-        return amountOnStorage>0;
-    }
 
     /**
      * it will buy shoe as you want w/o discount.
@@ -156,8 +155,8 @@ public class ShoeStorageInfo {
      */
     public synchronized boolean  buyShoe(boolean wantDiscount){
         if(amountOnStorage<0) {
-        //    System.out.println("errorrrrr SHOE STORAGE");
-            throw new NotEnoughShoesToBuy("We don1't have " + shoeType + " shoes to sell!");
+            System.out.println("ERROR ERROR ERROR ERROR - YOU SHOULD CHECK WHY THERE IS LESS THAN 0 AMOUNT ON STORAGE");
+            throw new Error("Negative Amount On Store, something went wrong");
         }
         else if(discountedAmount>0) {
             this.discountedAmount--;
@@ -174,8 +173,4 @@ public class ShoeStorageInfo {
         }
     }
 
-
-    public synchronized void resetDiscounted(){
-        this.discountedAmount = 0;
-    }
 }

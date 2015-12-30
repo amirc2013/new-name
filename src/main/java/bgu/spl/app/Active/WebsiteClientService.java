@@ -30,7 +30,7 @@ public class WebsiteClientService extends MicroService {
         this.list = list;
         this.set = set;
 
-        LOGGER.info(name + " has logged into the store !");
+    //    LOGGER.info(name + " has logged into the store !");
     }
 
     @Override

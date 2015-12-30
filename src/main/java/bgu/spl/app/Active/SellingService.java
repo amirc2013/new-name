@@ -1,5 +1,6 @@
 package bgu.spl.app.Active;
 
+import bgu.spl.Exception.NotOwnTheShoe;
 import bgu.spl.app.Messages.PurchaseOrderRequest;
 import bgu.spl.app.Messages.RestockRequest;
 import bgu.spl.app.Messages.TerminationBroadcast;
@@ -18,20 +19,24 @@ public class SellingService extends MicroService {
 
     private int currentTick ;
     private CountDownLatch cdl;
+    private CountDownLatch ender;
 
-    public SellingService(String name, CountDownLatch cdl){
+    public SellingService(String name, CountDownLatch cdl, CountDownLatch ender){
         super(name);
         this.cdl = cdl;
+        this.ender = ender;
         currentTick = 0 ;
-        LOGGER.info(this.getName()+" is here to serve our customer !");
-    }
+}
 
     @Override
     protected void initialize() {
         //updating currTick
         subscribeBroadcast(TickBroadcast.class,c -> this.currentTick = c.getCurrentTick() );
         subscribeRequest(PurchaseOrderRequest.class,this::handlePurchaseOrder);
-        subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
+        subscribeBroadcast(TerminationBroadcast.class, o -> {
+            terminate();
+            ender.countDown();
+        });
         cdl.countDown();
     }
 
@@ -53,6 +58,7 @@ public class SellingService extends MicroService {
                 complete(c, null);
                 LOGGER.info(c.getBuyer() + " has not bought " + c.getShoeType() + " since it does not have anymore Discount ");
             } else { //result == Store.BuyResult.NOT_IN_STOCK
+
                 LOGGER.info("Sending restock request for : " + c.getShoeType());
                 sendRequest(new RestockRequest(c.getShoeType()), c1 ->
                 {
@@ -67,8 +73,8 @@ public class SellingService extends MicroService {
                     }
                 });
             }
-        } catch (Exception e){
-            LOGGER.info(e.getMessage());
+        } catch (NotOwnTheShoe e){
+            LOGGER.info(c.getBuyer()+" tried to buy shoe that we dont own !");
         }
 
     }

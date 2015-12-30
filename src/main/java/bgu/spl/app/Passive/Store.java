@@ -1,6 +1,9 @@
 package bgu.spl.app.Passive;
 
 
+import bgu.spl.Exception.NegativeNumber;
+import bgu.spl.Exception.NoDiscountedShoe;
+import bgu.spl.Exception.NotOwnTheShoe;
 import bgu.spl.app.PrettyLogger;
 
 import java.util.*;
@@ -49,28 +52,28 @@ public class Store {
 
 
 
-    public BuyResult take(String shoeType , boolean onlyDiscount) {
+    public BuyResult take(String shoeType , boolean onlyDiscount) throws NotOwnTheShoe {
         ShoeStorageInfo shoe = storage.get(shoeType);
         
         	if(shoe != null){
         		synchronized(shoe){
-                    boolean discounted = false;
-                    if(shoe.getDiscountedAmount()>0)
-                        discounted = true;
+        		boolean discounted = false;
+        		if(shoe.getDiscountedAmount()>0)
+        			discounted = true;
 
-                    boolean ok = shoe.buyShoe(onlyDiscount);
+        		boolean ok = shoe.buyShoe(onlyDiscount);
 
-                    if(!ok && onlyDiscount) return BuyResult.NOT_ON_DISCOUNT;
-                    else if(ok && onlyDiscount) return  BuyResult.DISCOUNTED_PRICE;
-                    else if(ok && !onlyDiscount && !discounted) return  BuyResult.REGULAR_PRICE;
-                    else if(ok && !onlyDiscount && discounted) return  BuyResult.DISCOUNTED_PRICE;
-                    else return BuyResult.NOT_IN_STOCK;
-
+	            if(!ok && onlyDiscount) return BuyResult.NOT_ON_DISCOUNT;
+	            else if(ok && onlyDiscount) return  BuyResult.DISCOUNTED_PRICE;
+	            else if(ok && !onlyDiscount && !discounted) return  BuyResult.REGULAR_PRICE;
+	            else if(ok && !onlyDiscount && discounted) return  BuyResult.DISCOUNTED_PRICE;
+	            else return BuyResult.NOT_IN_STOCK;
+	
         		}
         	}
 	        else{
-	           // throw new RuntimeException("Something went wrong - no such a shoes in the storage");    // we should not get into thiss error.
-	         return BuyResult.NOT_IN_STOCK;
+	           throw new NotOwnTheShoe("We dont have this shoe in our store !");    // we should not get into thiss error.
+
 	        }
         
     }
@@ -94,13 +97,19 @@ public class Store {
      * @param amount
      */
     public void add(String shoeType, int amount) {
-        if(!storage.containsKey(shoeType)){
-            storage.put(shoeType, new ShoeStorageInfo(shoeType,amount,0));
+        try {
+            if(!storage.containsKey(shoeType)){
+              storage.put(shoeType, new ShoeStorageInfo(shoeType,amount,0));
+            }
+            else{
+                storage.get(shoeType).addNewShoes(amount);
+
+            }
+            if(amount>0)
+              System.out.println("Store : We added "+amount+" shoes of : "+shoeType);
+        } catch (NegativeNumber negativeNumber) {
+            negativeNumber.printStackTrace();
         }
-        else{
-            storage.get(shoeType).addNewShoes(amount);
-        }
-        LOGGER.info("Store : We added "+amount+" shoes of : "+shoeType);
     }
 
 
@@ -110,14 +119,19 @@ public class Store {
      * @param shoeType
      * @param amount
      */
-    public void addDiscount(String shoeType, int amount){
+    public void addDiscount(String shoeType, int amount) throws NoDiscountedShoe{
         if(!storage.containsKey(shoeType)){
-          LOGGER.info("Someone tried tried to add discount to something we don't own in our store");
+        //  LOGGER.info("Someone tried to add discount to something we don't own in our store");
+            throw new NoDiscountedShoe("Someone tried to add discount to something we don't own in our store");
         }
-        else{
-            storage.get(shoeType).addNewDiscountedShoes(amount);
+        else {
+            try {
+                storage.get(shoeType).addNewDiscountedShoes(amount);
+            } catch (NegativeNumber negativeNumber) {
+                throw new NoDiscountedShoe("Someone tried to add a negative discount ");
+            }
         }
-        LOGGER.info(storage.get(shoeType).getDiscountedAmount()+" DISCOUNTED shoes of : "+shoeType+" has been added");
+        LOGGER.info("Store : "+storage.get(shoeType).getDiscountedAmount()+" DISCOUNTED shoes of : "+shoeType+" has been added");
     }
 
     /**
@@ -133,19 +147,19 @@ public class Store {
 
         synchronized (storage){
             for (Map.Entry<String,ShoeStorageInfo> s : storage.entrySet()){
-                synchronized (LOGGER) {
-                    LOGGER.info("Shoe Type : " + s.getKey() + " : Amount of shoes - " + s.getValue().getAmountOfShoes()
-                            + " , Amount of discounted shoes - " + s.getValue().getDiscountedAmount());
+                synchronized (System.out) {
+                    System.out.println("Shoe Type : "+s.getKey()+" : Amount of shoes - "+s.getValue().getAmountOfShoes()
+                            +" , Amount of discounted shoes - "+s.getValue().getDiscountedAmount());
                 }
             }
         }
 
         synchronized (receipts){
             for (Receipt r : receipts){
-                synchronized (LOGGER) {
-                    LOGGER.info("Seller : " + r.getSeller() + " , Customer : " + r.getCustomer() + " , Shoe Type : " + r.getShoeType()
-                            + " , isDiscounted:" + r.isDiscount() + " , Issued Tick : " + r.getIssuedTick() + " , Request Tick : " +
-                            r.getRequestTick() + " , Amount Sold : " + r.getAmountSold());
+                synchronized (System.out) {
+                    System.out.println("Seller : "+r.getSeller()+" , Customer : "+r.getCustomer()+" , Shoe Type : "+r.getShoeType()
+                            +" , isDiscounted:"+r.isDiscount()+" , Issued Tick : "+r.getIssuedTick()+" , Request Tick : "+
+                            r.getRequestTick()+" , Amount Sold : "+r.getAmountSold());
                 }
             }
         }
