@@ -20,39 +20,10 @@ public class MessageBusImplTest {
 
     }
 
-    class TestRequest implements Request<TestResult> {
-
-    }
-
     class TestBroadcast implements Broadcast{}
 
-    @Before
-    public void setUp() throws Exception {
-
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
-    }
-
     @Test
-    public void testSubscribeRequest() throws Exception {
-
-    }
-
-    @Test
-    public void testSubscribeBroadcast() throws Exception {
-
-    }
-
-    @Test
-    public void testComplete() throws Exception {
-
-    }
-
-    @Test
-    public void testSendBroadcast() throws Exception {
+    public void test() throws Exception {
         Set<Integer> set = new CopyOnWriteArraySet<>();
         CountDownLatch cdl = new CountDownLatch(5);
         CountDownLatch cdl2 = new CountDownLatch(5);
@@ -92,25 +63,5 @@ public class MessageBusImplTest {
             e.printStackTrace();
             fail();
         }
-    }
-
-    @Test
-    public void testSendRequest() throws Exception {
-
-    }
-
-    @Test
-    public void testRegister() throws Exception {
-
-    }
-
-    @Test
-    public void testUnregister() throws Exception {
-
-    }
-
-    @Test
-    public void testAwaitMessage() throws Exception {
-
     }
 }
