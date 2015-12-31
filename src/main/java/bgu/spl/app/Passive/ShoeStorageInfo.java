@@ -173,4 +173,12 @@ public class ShoeStorageInfo {
         }
     }
 
+    @Override
+    public String toString() {
+        return "\nShoeStorageInfo{" + '\n' +
+                "\tshoeType='" + shoeType + '\'' + '\n' +
+                "\tamountOnStorage=" + amountOnStorage + '\n' +
+                "\tdiscountedAmount=" + discountedAmount + '\n' +
+                "}\n";
+    }
 }

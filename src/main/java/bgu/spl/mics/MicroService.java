@@ -7,6 +7,7 @@ import bgu.spl.mics.impl.RequestCompleted;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -154,7 +155,7 @@ public abstract class MicroService implements Runnable {
      * message.
      */
     protected final void terminate() {
-        LOGGER.info("terminating ...");
+        LOGGER.info("Terminating !");
         this.terminated = true;
     }
 
@@ -172,9 +173,10 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
+
         bus.register(this);
         initialize();
-        LOGGER.info("starting ...");
+        LOGGER.info("Starting ...");
         while (!terminated) {
             try {
                 Message m = bus.awaitMessage(this);
@@ -194,12 +196,16 @@ public abstract class MicroService implements Runnable {
                     Broadcast request = (Broadcast)m;
                     broadcastmap.get(request.getClass()).call(request);
                 }
-            } catch (InterruptedException | RuntimeException e) {
-                LOGGER.severe(e.getMessage());
-                e.printStackTrace();
+            }
+            catch (RuntimeException | InterruptedException e){
+                synchronized (System.out){
+                    LOGGER.severe(e.toString());
+                    for(StackTraceElement element : e.getStackTrace())
+                        LOGGER.severe(element.toString());
+                }
             }
         }
-        LOGGER.info("ended");
+        LOGGER.info("Ended.");
         bus.unregister(this);
     }
 }

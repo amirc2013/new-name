@@ -8,6 +8,7 @@ import bgu.spl.app.Passive.PurchaseSchedule;
 import bgu.spl.app.Passive.Store;
 import bgu.spl.mics.MicroService;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -29,18 +30,15 @@ public class WebsiteClientService extends MicroService {
         currentTick = 0 ;
         this.list = list;
         this.set = set;
-
-    //    LOGGER.info(name + " has logged into the store !");
     }
 
     @Override
     protected void initialize() {
-        Store myStore = Store.getInstance();
-
         //updating currTick
         subscribeBroadcast(TickBroadcast.class, this::handleTicks);
         subscribeBroadcast(NewDiscountBroadcast.class,this::handleDiscountBro);
         subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
+        LOGGER.info("Logging-in ...");
         cdl.countDown();
     }
     private void handleDiscountBro(NewDiscountBroadcast c){
@@ -48,6 +46,7 @@ public class WebsiteClientService extends MicroService {
                 sendRequest(new PurchaseOrderRequest(getName(),c.getShoeName(),true,currentTick),c1 ->{
                     if(c1!=null){
                         set.remove(c.getShoeName());
+                        quitIfNeeded();
                         //System.out.println(this.getName()+" has successfully got "+c.getShoeName());
                     }
                 });
@@ -55,16 +54,25 @@ public class WebsiteClientService extends MicroService {
     }
 
     private void handleTicks(TickBroadcast c){
-            this.currentTick = c.getCurrentTick();
+        this.currentTick = c.getCurrentTick();
 
-            for(PurchaseSchedule ps : list){
-                if(ps.getTick() == c.getCurrentTick()){
-                    LOGGER.info(this.getName()+" is trying to buy "+ps.getShoeType());
-                    sendRequest(new PurchaseOrderRequest(getName(),ps.getShoeType(),false,currentTick),c1 -> { 
-                    	
-                            }
-                    );
-                }
-            }
+        list.stream().filter(ps -> ps.getTick() == c.getCurrentTick()).forEach(ps -> {
+            LOGGER.info(String.format("Trying to buy a %s", ps.getShoeType()));
+            sendRequest(new PurchaseOrderRequest(getName(), ps.getShoeType(), false, currentTick), r -> {
+                        if (r != null) {
+                            LOGGER.info(String.format("Purchased a %s, and got receipt: %s",r.getShoeType(),r.toString()));
+                            list.remove(ps);
+                            quitIfNeeded();
+                        }
+                    }
+            );
+        });
+    }
+
+    void quitIfNeeded() {
+        if(set.isEmpty() && list.isEmpty()){
+            LOGGER.info("Purchased Everything I Wanted, Logging-out ...");
+            terminate();
+        }
     }
 }

@@ -20,6 +20,7 @@ public class SellingService extends MicroService {
     private int currentTick ;
     private CountDownLatch cdl;
     private CountDownLatch ender;
+    Store myStore = Store.getInstance();
 
     public SellingService(String name, CountDownLatch cdl, CountDownLatch ender){
         super(name);
@@ -31,7 +32,7 @@ public class SellingService extends MicroService {
     @Override
     protected void initialize() {
         //updating currTick
-        subscribeBroadcast(TickBroadcast.class,c -> this.currentTick = c.getCurrentTick() );
+        subscribeBroadcast(TickBroadcast.class, c -> this.currentTick = c.getCurrentTick());
         subscribeRequest(PurchaseOrderRequest.class,this::handlePurchaseOrder);
         subscribeBroadcast(TerminationBroadcast.class, o -> {
             terminate();
@@ -41,42 +42,41 @@ public class SellingService extends MicroService {
     }
 
     private void handlePurchaseOrder(PurchaseOrderRequest c){
-        try {
-            Store myStore = Store.getInstance();
-            Store.BuyResult result = myStore.take(c.getShoeType(), c.isOnlyDiscount());
-            if (result == Store.BuyResult.REGULAR_PRICE) {
-                Receipt r = new Receipt(super.getName(), c.getBuyer(), c.getShoeType(), false, this.currentTick, c.getRequestTick(), 1);
-                myStore.file(r);
-                complete(c, r);
-                LOGGER.info(c.getBuyer() + " has bought " + c.getShoeType() + " successfully without Discount");
-            } else if (result == Store.BuyResult.DISCOUNTED_PRICE) {
-                Receipt r = new Receipt(super.getName(), c.getBuyer(), c.getShoeType(), true, this.currentTick, c.getRequestTick(), 1);
-                myStore.file(r);
-                complete(c, r);
-                LOGGER.info(c.getBuyer() + " has bought " + c.getShoeType() + " successfully with Discount ! woohoo");
-            } else if (result == Store.BuyResult.NOT_ON_DISCOUNT) {
-                complete(c, null);
-                LOGGER.info(c.getBuyer() + " has not bought " + c.getShoeType() + " since it does not have anymore Discount ");
-            } else { //result == Store.BuyResult.NOT_IN_STOCK
-
+        Store.BuyResult result = myStore.take(c.getShoeType(), c.isOnlyDiscount());
+        switch (result){
+            case REGULAR_PRICE:
+            case DISCOUNTED_PRICE:{
+                boolean b = result != Store.BuyResult.REGULAR_PRICE;
+                buy(c,b);
+                break;
+            }
+            case NOT_ON_DISCOUNT:{
+                disregard(c);
+                break;
+            }
+            case NOT_IN_STOCK:{
                 LOGGER.info("Sending restock request for : " + c.getShoeType());
-                sendRequest(new RestockRequest(c.getShoeType()), c1 ->
-                {
-                    if (c1) {
-                        Receipt r = new Receipt(super.getName(), c.getBuyer(), c.getShoeType(), false, this.currentTick, c.getRequestTick(), 1);
-                        myStore.file(r);
-                        complete(c, r);
-                        LOGGER.info(c.getBuyer() + " has bought " + c.getShoeType() + " successfully without Discount (after Restock)");
+                sendRequest(new RestockRequest(c.getShoeType()), res ->{
+                    if (res) {
+                        buy(c, false);
                     } else {
-                        complete(c, null);
-                        LOGGER.info(c.getBuyer() + " has not bought " + c.getShoeType() + " since we dont have shoes of that kind left");
+                        disregard(c);
                     }
                 });
+                break;
             }
-        } catch (NotOwnTheShoe e){
-            LOGGER.info(c.getBuyer()+" tried to buy shoe that we dont own !");
         }
-
     }
 
+    void buy(PurchaseOrderRequest c , boolean discount){
+        LOGGER.info(String.format("%s has bought %s successfully with%s discount",c.getBuyer(),c.getShoeType(),discount ? "":"out"));
+        Receipt r = new Receipt(getName(), c.getBuyer(), c.getShoeType(), discount, currentTick, c.getRequestTick(), 1);
+        myStore.file(r);
+        complete(c, r);
+    }
+
+    void disregard(PurchaseOrderRequest c){
+        LOGGER.info(String.format("%s did not buy %s since it does not have a discount",c.getBuyer(),c.getShoeType()));
+        complete(c, null);
+    }
 }

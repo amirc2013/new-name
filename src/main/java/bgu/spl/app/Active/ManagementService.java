@@ -26,7 +26,7 @@ public class ManagementService extends MicroService {
     private CountDownLatch cdl;
 
     public ManagementService(List<DiscountSchedule> schedule, CountDownLatch cdl) {
-        super("manager");
+        super("Manager");
         this.schedule = schedule;
         this.cdl = cdl;
     }
@@ -49,10 +49,10 @@ public class ManagementService extends MicroService {
                     .findFirst();
 
             if (s.isPresent()) {
+                LOGGER.info(String.format("50%% Discount on %d shoes of type: %s",s.get().getAmount(),s.get().getShoeType()));
                 Store store = Store.getInstance();
                 store.addDiscount(s.get().getShoeType(), s.get().getAmount());
                 sendBroadcast(new NewDiscountBroadcast(s.get().getShoeType(), s.get().getAmount()));
-                LOGGER.info("Broadcast : we have a 50% discount on : " + s.get().getShoeType());
             }
         }
         catch (NoDiscountedShoe e){
@@ -62,7 +62,6 @@ public class ManagementService extends MicroService {
 
     private void handleRestockRequest(RestockRequest r) {
         try {
-            LOGGER.info("Handling Restock Request");
             recentRequests.add(r);
             if (!restockRequests.containsKey(r.getShoeType()))
                 restockRequests.put(r.getShoeType(), -1);
@@ -74,7 +73,7 @@ public class ManagementService extends MicroService {
                 if (b) {
                     restockRequests.put(r.getShoeType(), restockRequests.get(r.getShoeType()) + requestAmount);
                     if (requestAmount > 1)
-                        LOGGER.info("We restocked " + requestAmount + " " + r.getShoeType() + " , be aware that some of the shoes are kept for someone else already");
+                        LOGGER.info(String.format("Restocked %d shoes of type: %s",requestAmount,r.getShoeType()));
                 } else {
                     LOGGER.info("No restock for : " + r.getShoeType());
                     complete(r, false);
@@ -87,7 +86,6 @@ public class ManagementService extends MicroService {
     }
 
     private void onManufacturingOrderRequestCompleted(Receipt receipt) {
-        LOGGER.info("Manufacturing Order Request Completed");
         store.add(receipt.getShoeType(),receipt.getAmountSold()-recentRequests.size());
         store.file(receipt);
         for(RestockRequest r : recentRequests){

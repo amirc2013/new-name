@@ -52,30 +52,27 @@ public class Store {
 
 
 
-    public BuyResult take(String shoeType , boolean onlyDiscount) throws NotOwnTheShoe {
+    public BuyResult take(String shoeType , boolean onlyDiscount){
         ShoeStorageInfo shoe = storage.get(shoeType);
         
         	if(shoe != null){
         		synchronized(shoe){
-        		boolean discounted = false;
-        		if(shoe.getDiscountedAmount()>0)
-        			discounted = true;
+                    boolean discounted = false;
+                    if(shoe.getDiscountedAmount()>0)
+                        discounted = true;
 
-        		boolean ok = shoe.buyShoe(onlyDiscount);
+                    boolean ok = shoe.buyShoe(onlyDiscount);
 
-	            if(!ok && onlyDiscount) return BuyResult.NOT_ON_DISCOUNT;
-	            else if(ok && onlyDiscount) return  BuyResult.DISCOUNTED_PRICE;
-	            else if(ok && !onlyDiscount && !discounted) return  BuyResult.REGULAR_PRICE;
-	            else if(ok && !onlyDiscount && discounted) return  BuyResult.DISCOUNTED_PRICE;
-	            else return BuyResult.NOT_IN_STOCK;
-	
-        		}
+                    if(!ok && onlyDiscount) return BuyResult.NOT_ON_DISCOUNT;
+                    else if(ok && onlyDiscount) return  BuyResult.DISCOUNTED_PRICE;
+                    else if(ok && !onlyDiscount && !discounted) return  BuyResult.REGULAR_PRICE;
+                    else if(ok && !onlyDiscount && discounted) return  BuyResult.DISCOUNTED_PRICE;
+                    else return BuyResult.NOT_IN_STOCK;
+                }
         	}
 	        else{
-	           throw new NotOwnTheShoe("We dont have this shoe in our store !");    // we should not get into thiss error.
-
+                return BuyResult.NOT_IN_STOCK;
 	        }
-        
     }
 
 
@@ -106,7 +103,7 @@ public class Store {
 
             }
             if(amount>0)
-              System.out.println("Store : We added "+amount+" shoes of : "+shoeType);
+                LOGGER.info("We added "+amount+" shoes of : "+shoeType);
         } catch (NegativeNumber negativeNumber) {
             negativeNumber.printStackTrace();
         }
@@ -121,7 +118,7 @@ public class Store {
      */
     public void addDiscount(String shoeType, int amount) throws NoDiscountedShoe{
         if(!storage.containsKey(shoeType)){
-        //  LOGGER.info("Someone tried to add discount to something we don't own in our store");
+            LOGGER.info("Someone tried to add discount to something we don't own in our store");
             throw new NoDiscountedShoe("Someone tried to add discount to something we don't own in our store");
         }
         else {
@@ -139,7 +136,7 @@ public class Store {
      * @param receipt
      */
     public void file(Receipt receipt){
-            receipts.add(receipt);
+        receipts.add(receipt);
     }
 
 
@@ -148,20 +145,19 @@ public class Store {
         synchronized (storage){
             for (Map.Entry<String,ShoeStorageInfo> s : storage.entrySet()){
                 synchronized (System.out) {
-                    System.out.println("Shoe Type : "+s.getKey()+" : Amount of shoes - "+s.getValue().getAmountOfShoes()
-                            +" , Amount of discounted shoes - "+s.getValue().getDiscountedAmount());
+                    LOGGER.info(s.getValue().toString());
                 }
             }
+            LOGGER.info("Number of shoes: "+ storage.size());
         }
 
         synchronized (receipts){
             for (Receipt r : receipts){
                 synchronized (System.out) {
-                    System.out.println("Seller : "+r.getSeller()+" , Customer : "+r.getCustomer()+" , Shoe Type : "+r.getShoeType()
-                            +" , isDiscounted:"+r.isDiscount()+" , Issued Tick : "+r.getIssuedTick()+" , Request Tick : "+
-                            r.getRequestTick()+" , Amount Sold : "+r.getAmountSold());
+                    LOGGER.info(r.toString());
                 }
             }
+            LOGGER.info("Number of receipts: "+ receipts.size());
         }
     }
 

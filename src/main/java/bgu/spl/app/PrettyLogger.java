@@ -24,7 +24,7 @@ public class PrettyLogger {
         Handler conHdlr = new PrettyHandler();
         conHdlr.setFormatter(new Formatter() {
             public String format(LogRecord record) {
-                String msg = String.format("(%s) %s -> %s \n", record.getLevel(),record.getLoggerName(),record.getMessage());
+                String msg = String.format("%s -> %s \n",record.getLoggerName(),record.getMessage());
                 if(record.getLevel() == Level.SEVERE)
                     msg = ANSI_RED + msg;
                 if(record.getLevel() == Level.WARNING)

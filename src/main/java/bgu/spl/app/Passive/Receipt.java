@@ -50,4 +50,17 @@ public class Receipt {
     public int getAmountSold() {
         return amountSold;
     }
+
+    @Override
+    public String toString() {
+        return "\nReceipt{" + '\n'+
+                "\tseller='" + seller + '\'' + '\n'+
+                "\tcustomer='" + customer + '\'' + '\n'+
+                "\tshoeType='" + shoeType + '\'' + '\n'+
+                "\tdiscount=" + discount + '\n'+
+                "\tissuedTick=" + issuedTick + '\n'+
+                "\trequestTick=" + requestTick + '\n'+
+                "\tamountSold=" + amountSold + '\n'+
+                "}\n";
+    }
 }

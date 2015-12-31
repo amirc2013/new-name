@@ -38,9 +38,9 @@ public class ShoeFactoryService extends MicroService{
         currentTick = tickBroadcast.getCurrentTick();
         if(!queue.isEmpty()){
             completedShoes++;
-            if(completedShoes >= queue.peek().getAmount()){
-                Receipt r = new Receipt(getName(),"store",queue.peek().getShoeType(),false,currentTick,queue.peek().getIssuedTick(),queue.peek().getAmount());
-                LOGGER.info("Completing Restock Request");
+            if(completedShoes == queue.peek().getAmount()){
+                Receipt r = new Receipt(getName(),"Store",queue.peek().getShoeType(),false,currentTick,queue.peek().getIssuedTick(),queue.peek().getAmount());
+                LOGGER.info("Completing Manufacturing Order Request with: " + r.toString());
                 complete(queue.remove(),r);
                 completedShoes = 0;
             }

@@ -21,7 +21,7 @@ public class TimeService extends MicroService{
     private CountDownLatch ender;
 
     public TimeService(int speed, int duration , CountDownLatch cdl, CountDownLatch ender) {
-        super("timer");
+        super("Timer");
         this.cdl = cdl;
         if(speed<=0 && duration<=0)
             throw new RuntimeException("TimeService Arguments must be valid");
@@ -33,33 +33,36 @@ public class TimeService extends MicroService{
 
     @Override
     protected void initialize() {
-        try { // wait until all the services are ready !
+        try {
             cdl.await();
-            LOGGER.info("System has been Initialized !");
+            LOGGER.info("System has been Started !");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        subscribeBroadcast(TerminationBroadcast.class, o -> terminate());
+        subscribeBroadcast(TerminationBroadcast.class, o -> {
+            terminate();
+            ender.countDown();
+        });
+
         Timer t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
                 currentTime++;
                 sendBroadcast(new TickBroadcast(currentTime));
-                LOGGER.info("Broadcast : The time now is " + currentTime);
-                if(currentTime >= duration){
-                    LOGGER.info("Termination Broadcast");
-                    LOGGER.info("TimeService terminating !");
+                LOGGER.info("Tick: " + currentTime);
+                if (currentTime >= duration) {
+                    LOGGER.info("Terminating System !");
                     sendBroadcast(new TerminationBroadcast());
                     t.cancel();
+
                     try {
                         ender.await();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    Store.getInstance().print();
-                    terminate();
 
+                    Store.getInstance().print();
                 }
             }
         }, 0, speed);
